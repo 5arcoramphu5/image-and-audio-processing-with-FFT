@@ -55,6 +55,32 @@
         <property name="title">
          <string>filtering</string>
         </property>
+        <widget class="QPushButton" name="uploadButton">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>390</y>
+           <width>61</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>upload</string>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="applyButton">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>350</y>
+           <width>61</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>apply</string>
+         </property>
+        </widget>
        </widget>
       </widget>
       <widget class="QWidget" name="audioTab">
