@@ -27,16 +27,6 @@
        <attribute name="title">
         <string>images</string>
        </attribute>
-       <widget class="QGraphicsView" name="graphicsView">
-        <property name="geometry">
-         <rect>
-          <x>84</x>
-          <y>0</y>
-          <width>691</width>
-          <height>421</height>
-         </rect>
-        </property>
-       </widget>
        <widget class="QGroupBox" name="groupBox">
         <property name="geometry">
          <rect>
@@ -81,6 +71,19 @@
           <string>apply</string>
          </property>
         </widget>
+       </widget>
+       <widget class="QLabel" name="unprocessedImage">
+        <property name="geometry">
+         <rect>
+          <x>230</x>
+          <y>40</y>
+          <width>351</width>
+          <height>251</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
        </widget>
       </widget>
       <widget class="QWidget" name="audioTab">
