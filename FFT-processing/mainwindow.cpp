@@ -1,10 +1,12 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include "image_utils.h"
+#include "utils/fourier.h"
 
 #include <QFileDialog>
 #include <QImage>
 #include <QLabel>
+#include <QColor>
 
 #include<QDebug>
 
@@ -18,15 +20,27 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-
 void MainWindow::on_applyButton_clicked()
 {
-
+    processWithFFT(processedImage);
+    showImage(processedImage, *(ui->processedImage));
 }
-
 
 void MainWindow::on_uploadButton_clicked()
 {
-    QImage image = openImageFromFileExplorer(this);
+    image = openImageFromFileExplorer(this);
+    processedImage = image;
+    imageDFT = fft2D(image);
+    processedDFT = imageDFT;
+
     showImage(image, *(ui->unprocessedImage));
+    showImage(processedImage, *(ui->processedImage));
+    showImage(imageDFT, *(ui->unprocessedImageDFT));
+    showImage(processedDFT, *(ui->processedImageDFT));
 }
+
+void MainWindow::on_saveButton_clicked()
+{
+    saveImageToDistFromFileExplorer(processedImage, this);
+}
+

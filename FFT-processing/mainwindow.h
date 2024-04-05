@@ -20,7 +20,13 @@ private slots:
 
     void on_uploadButton_clicked();
 
+    void on_saveButton_clicked();
+
 private:
     Ui::MainWindow *ui;
+    QImage image;
+    QImage processedImage;
+    QImage imageDFT;
+    QImage processedDFT;
 };
 #endif // MAINWINDOW_H

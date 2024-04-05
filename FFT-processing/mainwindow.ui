@@ -72,17 +72,81 @@
          </property>
         </widget>
        </widget>
-       <widget class="QLabel" name="unprocessedImage">
+       <widget class="QLabel" name="processedImage">
         <property name="geometry">
          <rect>
-          <x>230</x>
-          <y>40</y>
-          <width>351</width>
-          <height>251</height>
+          <x>360</x>
+          <y>220</y>
+          <width>250</width>
+          <height>200</height>
          </rect>
         </property>
         <property name="text">
          <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap>../../../../../../run/user/1000/doc/4189995d/gray.png</pixmap>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="saveButton">
+        <property name="geometry">
+         <rect>
+          <x>420</x>
+          <y>380</y>
+          <width>80</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>save</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="unprocessedImage">
+        <property name="geometry">
+         <rect>
+          <x>100</x>
+          <y>220</y>
+          <width>250</width>
+          <height>200</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap>../../../../../../run/user/1000/doc/4189995d/gray.png</pixmap>
+        </property>
+       </widget>
+       <widget class="QLabel" name="unprocessedImageDFT">
+        <property name="geometry">
+         <rect>
+          <x>100</x>
+          <y>10</y>
+          <width>250</width>
+          <height>200</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap>../../../../../../run/user/1000/doc/4189995d/gray.png</pixmap>
+        </property>
+       </widget>
+       <widget class="QLabel" name="processedImageDFT">
+        <property name="geometry">
+         <rect>
+          <x>360</x>
+          <y>10</y>
+          <width>250</width>
+          <height>200</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap>../../../../../../run/user/1000/doc/4189995d/gray.png</pixmap>
         </property>
        </widget>
       </widget>

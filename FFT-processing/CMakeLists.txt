@@ -39,6 +39,7 @@ else()
         add_executable(FFT-processing
             ${PROJECT_SOURCES}
             image_utils.h image_utils.cpp
+            utils/fourier.h utils/fourier.cpp
 
         )
     endif()
