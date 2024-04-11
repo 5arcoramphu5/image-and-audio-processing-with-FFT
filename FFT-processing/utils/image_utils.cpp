@@ -1,5 +1,6 @@
 #include "image_utils.h"
-#include "utils/fourier.h"
+#include "fourier.h"
+#include "complex_image.h"
 
 #include <QFileDialog>
 
@@ -13,7 +14,7 @@ void showImage(QImage &image, QLabel &label)
 
 QImage openImageFromFileExplorer(QWidget *parent)
 {
-    QString fileName = QFileDialog::getOpenFileName(parent, "Open File", "/home", "Images (*.png *.xpm *.jpg *.bmp)");
+    QString fileName = QFileDialog::getOpenFileName(parent, "Open File", QString(), "Images (*.png *.xpm *.jpg *.bmp)");
     return QImage(fileName);
 }
 
@@ -27,12 +28,6 @@ void saveImageToDistFromFileExplorer(QImage &image, QWidget *parent)
 
 QImage processWithFFT(QImage &image)
 {
-    return fft2D(image);
-    // for(int i = 0; i < image.size().width(); ++i)
-    //     for(int j = 0; j < image.size().height(); ++j)
-    //     {
-    //         QRgb color = image.pixel(i, j);
-    //         QColor newColor(qRed(color), 255, 255, qAlpha(color));
-    //         image.setPixelColor(i, j, newColor);
-    //     }
+    ComplexImage complexImage(image);
+    return complexImage.toImageFromAbs();
 }

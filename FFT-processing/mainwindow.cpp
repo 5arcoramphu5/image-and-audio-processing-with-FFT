@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
-#include "image_utils.h"
+#include "utils/image_utils.h"
 #include "utils/fourier.h"
 
 #include <QFileDialog>
@@ -30,7 +30,7 @@ void MainWindow::on_uploadButton_clicked()
 {
     image = openImageFromFileExplorer(this);
     processedImage = image;
-    imageDFT = fft2D(image);
+    imageDFT = fft2D(image).toImageFromReal();
     processedDFT = imageDFT;
 
     showImage(image, *(ui->unprocessedImage));
