@@ -29,9 +29,11 @@ void MainWindow::on_applyButton_clicked()
 void MainWindow::on_uploadButton_clicked()
 {
     image = openImageFromFileExplorer(this);
-    processedImage = image;
-    imageDFT = fft2D(image).toImageFromReal();
+    ComplexImage dft = fft2D(image);
+    imageDFT = dft.toImageFromAbs();
     processedDFT = imageDFT;
+    // processedImage = image;
+    processedImage = ifft2D(dft).toImageFromReal();
 
     showImage(image, *(ui->unprocessedImage));
     showImage(processedImage, *(ui->processedImage));

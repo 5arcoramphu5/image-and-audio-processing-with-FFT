@@ -5,8 +5,10 @@
 #include <QImage>
 #include <complex>
 
-ComplexImage fft2D(ComplexImage &image);
 
-ComplexImage fft2D(QImage &image);
+ComplexImage fft2D(const ComplexImage &image);
+ComplexImage fft2D(const QImage &image);
+
+ComplexImage ifft2D(const ComplexImage &image);
 
 #endif // FOURIER_H
