@@ -9,6 +9,7 @@
 
 typedef std::vector<COMPLEX_DOUBLE> COMPLEX_VECTOR;
 typedef std::vector<COMPLEX_VECTOR> COMPLEX_MATRIX;
+typedef double (*complexToDouble)(COMPLEX_DOUBLE);
 
 class ComplexImage
 {
@@ -29,6 +30,7 @@ class ComplexImage
         ComplexColor getColor(int i, int j) const;
 
     private:
+        QImage toImage(complexToDouble convert) const;
         bool isInsideImage(int i, int j) const;
 };
 #endif // COMPLEX_IMAGE_H

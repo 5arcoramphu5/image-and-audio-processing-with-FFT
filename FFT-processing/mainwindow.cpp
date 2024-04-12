@@ -10,6 +10,7 @@
 
 #include<QDebug>
 
+
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
@@ -22,23 +23,29 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_applyButton_clicked()
 {
-    processWithFFT(processedImage);
-    showImage(processedImage, *(ui->processedImage));
+    processWithFFT(dft, processedDFT, processedImage);
+    showImages();
 }
 
 void MainWindow::on_uploadButton_clicked()
 {
     image = openImageFromFileExplorer(this);
-    ComplexImage dft = fft2D(image);
+    dft = fft2D(image);
     imageDFT = dft.toImageFromAbs();
     processedDFT = imageDFT;
-    // processedImage = image;
-    processedImage = ifft2D(dft).toImageFromReal();
+    processedImage = image;
 
+    showImages();
+}
+
+void MainWindow::showImages()
+{
+    qDebug() <<"images start";
     showImage(image, *(ui->unprocessedImage));
-    showImage(processedImage, *(ui->processedImage));
     showImage(imageDFT, *(ui->unprocessedImageDFT));
+    showImage(processedImage, *(ui->processedImage));
     showImage(processedDFT, *(ui->processedImageDFT));
+    qDebug() <<"images end";
 }
 
 void MainWindow::on_saveButton_clicked()

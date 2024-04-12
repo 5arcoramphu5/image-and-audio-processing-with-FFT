@@ -4,7 +4,7 @@
 
 #include <QFileDialog>
 
-#include <iostream>
+#include <QDebug>
 
 void showImage(QImage &image, QLabel &label)
 {
@@ -23,11 +23,43 @@ void saveImageToDistFromFileExplorer(QImage &image, QWidget *parent)
     QString path = QFileDialog::getSaveFileName(parent, "Choose location");
     bool result = image.save(path + ".png");
     if(!result)
-        std::cerr << "error saving file" << std::endl;
+        qDebug() << "error saving file";
 }
 
-QImage processWithFFT(QImage &image)
+void blur(ComplexImage &dft, double param)
 {
-    ComplexImage complexImage(image);
-    return complexImage.toImageFromAbs();
+    // deleting smallest frequencies (in the middle)
+    int radiusX = round(dft.size.height() / 2 * param);
+    int radiusY = round(dft.size.width() / 2 * param);
+    int middleX = round(dft.size.height() / 2);
+    int middleY = round(dft.size.width() / 2);
+    ComplexColor zero(0, 0, 0);
+
+    for(int i = 0; i < radiusX; ++i)
+        for(int j = 0; j < dft.size.width(); ++j)
+        {
+            dft.setColor(middleX + i, j, zero);
+            dft.setColor(middleX - i, j, zero);
+        }
+
+    for(int i = 0; i < dft.size.height(); ++i)
+        for(int j = 0; j < radiusY; ++j)
+        {
+            dft.setColor(i, middleY + j, zero);
+            dft.setColor(i, middleY - j, zero);
+        }
+}
+
+void processWithFFT(ComplexImage &dft, QImage &processedDFTImage, QImage &processedImage)
+{
+    ComplexImage processedDFT(dft);
+
+    blur(dft, 0.3);
+    qDebug() << "done";
+
+    ComplexImage ifft = ifft2D(processedDFT);
+    qDebug() << "done ifft";
+    processedDFTImage = processedDFT.toImageFromAbs();
+    processedImage = ifft.toImageFromReal();
+    qDebug() << "done convertion";
 }

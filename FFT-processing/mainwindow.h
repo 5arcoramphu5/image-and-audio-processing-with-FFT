@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "utils/complex_image.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -24,9 +25,15 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+
     QImage image;
     QImage processedImage;
+
+    ComplexImage dft;
+
     QImage imageDFT;
     QImage processedDFT;
+
+    void showImages();
 };
 #endif // MAINWINDOW_H

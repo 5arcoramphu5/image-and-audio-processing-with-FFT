@@ -39,12 +39,12 @@ ComplexImage::ComplexImage(const QImage &image)
     }
 }
 
-int toPixelValue(COMPLEX_DOUBLE x)
+int toPixelValue(COMPLEX_DOUBLE x, complexToDouble convert)
 {
-    double doubleValue = abs(x);
-    // to interval [0, 255]:
-    // doubleValue = atan(doubleValue) * 2 /  M_PI;
-    // doubleValue *= 255;
+    // static const double C = 5;
+    double doubleValue = convert(x);
+    // // to interval [0, 255], (max value / 5 -> 255)
+    // doubleValue = doubleValue * 255 / (maxValue / C);
 
     int pixelValue = round(doubleValue);
 
@@ -56,38 +56,46 @@ int toPixelValue(COMPLEX_DOUBLE x)
     return pixelValue;
 }
 
-QImage ComplexImage::toImageFromAbs() const
+double maxValue(const COMPLEX_MATRIX matrix, const QSize &size, const complexToDouble convert)
+{
+    double max = convert(matrix[0][0]);
+    for(int i = 0; i < size.width(); ++i)
+        for(int j = 0; j < size.height(); ++j)
+        {
+            double dValue = convert(matrix[i][j]);
+            if(dValue > max)
+                max = dValue;
+        }
+}
+
+QImage ComplexImage::toImage(complexToDouble convert) const
 {
     QImage image(size, QImage::Format_RGB32);
+    // double maxRed = maxValue(redChannel, size, convert);
+    // double maxGreen = maxValue(greenChannel, size, convert);
+    // double maxBlue = maxValue(blueChannel, size, convert);
 
     for(int i = 0; i < size.width(); ++i)
         for(int j = 0; j < size.height(); ++j)
         {
-            int r = toPixelValue(redChannel[i][j]);
-            int g = toPixelValue(greenChannel[i][j]);
-            int b = toPixelValue(blueChannel[i][j]);
+            int r = toPixelValue(redChannel[i][j], convert);
+            int g = toPixelValue(greenChannel[i][j], convert);
+            int b = toPixelValue(blueChannel[i][j], convert);
             image.setPixelColor(i, j, QColor(r, g, b));
         }
 
     return image;
+}
+
+QImage ComplexImage::toImageFromAbs() const
+{
+    return toImage([](COMPLEX_DOUBLE x){ return std::abs(x); });
 }
 
 QImage ComplexImage::toImageFromReal() const
 {
-    QImage image(size, QImage::Format_RGB32);
-
-    for(int i = 0; i < size.width(); ++i)
-        for(int j = 0; j < size.height(); ++j)
-        {
-            int r = toPixelValue(real(redChannel[i][j]));
-            int g = toPixelValue(real(greenChannel[i][j]));
-            int b = toPixelValue(real(blueChannel[i][j]));
-            image.setPixelColor(i, j, QColor(r, g, b));
-        }
-
-    return image;
+    return toImage([](COMPLEX_DOUBLE x){ return std::real(x); });
 }
-
 
 bool ComplexImage::isInsideImage(int i, int j) const
 {
