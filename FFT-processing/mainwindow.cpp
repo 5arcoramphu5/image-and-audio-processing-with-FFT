@@ -35,17 +35,24 @@ void MainWindow::on_uploadButton_clicked()
     processedDFT = imageDFT;
     processedImage = image;
 
+    setScaledImages(false);
     showImages();
 }
 
 void MainWindow::showImages()
 {
-    qDebug() <<"images start";
     showImage(image, *(ui->unprocessedImage));
     showImage(imageDFT, *(ui->unprocessedImageDFT));
     showImage(processedImage, *(ui->processedImage));
     showImage(processedDFT, *(ui->processedImageDFT));
-    qDebug() <<"images end";
+}
+
+void MainWindow::setScaledImages(bool scaled)
+{
+    ui->unprocessedImage->setScaledContents(scaled);
+    ui->unprocessedImageDFT->setScaledContents(scaled);
+    ui->processedImage->setScaledContents(scaled);
+    ui->processedImageDFT->setScaledContents(scaled);
 }
 
 void MainWindow::on_saveButton_clicked()

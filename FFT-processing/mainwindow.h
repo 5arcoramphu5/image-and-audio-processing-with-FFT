@@ -35,5 +35,6 @@ private:
     QImage processedDFT;
 
     void showImages();
+    void setScaledImages(bool scaled);
 };
 #endif // MAINWINDOW_H
