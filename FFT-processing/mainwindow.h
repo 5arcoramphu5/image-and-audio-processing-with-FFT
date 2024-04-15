@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QMovie>
 #include "utils/complex_image.h"
 
 QT_BEGIN_NAMESPACE
@@ -28,13 +29,16 @@ private:
 
     QImage image;
     QImage processedImage;
-
-    ComplexImage dft;
-
     QImage imageDFT;
     QImage processedDFT;
 
+    ComplexImage dft;
+
+    QMovie loadingGif;
+
     void showImages();
+    void loadImagesAndDFTs(QImage& image);
     void setScaledImages(bool scaled);
+    void setImagesLoading();
 };
 #endif // MAINWINDOW_H

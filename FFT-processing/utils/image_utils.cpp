@@ -53,13 +53,9 @@ void blur(ComplexImage &dft, double param)
 void processWithFFT(ComplexImage &dft, QImage &processedDFTImage, QImage &processedImage)
 {
     ComplexImage processedDFT(dft);
-
-    blur(dft, 0.3);
-    qDebug() << "done";
+    blur(processedDFT, 0.7);
 
     ComplexImage ifft = ifft2D(processedDFT);
-    qDebug() << "done ifft";
     processedDFTImage = processedDFT.toImageFromAbs();
     processedImage = ifft.toImageFromReal();
-    qDebug() << "done convertion";
 }
