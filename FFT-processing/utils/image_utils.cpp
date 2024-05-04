@@ -59,3 +59,9 @@ void processWithFFT(ComplexImage &dft, QImage &processedDFTImage, QImage &proces
     processedDFTImage = processedDFT.toImageFromAbs();
     processedImage = ifft.toImageFromReal();
 }
+
+void displayAsLoading(QLabel* label, QMovie &movie)
+{
+    label->setMovie(&movie);
+    label->show();
+}

@@ -8,6 +8,8 @@ typedef std::complex<double> COMPLEX_DOUBLE;
 const int FFT_MIN_SIZE = 16;
 const COMPLEX_DOUBLE I(0, 1);
 
+ComplexImage dft2D(const ComplexImage &image);
+
 ComplexImage fft2D(const QImage &image)
 {
     ComplexImage complexImage(image);
@@ -24,11 +26,11 @@ ComplexImage fft2D(const ComplexImage &image)
 {
     // TODO: handling sizes not being powers of 2
 
-    // if(image.size.width() < FFT_MIN_SIZE && image.size.height() < FFT_MIN_SIZE)
-    //     return dft2D(image);
+    if(image.size.width() < FFT_MIN_SIZE && image.size.height() < FFT_MIN_SIZE)
+        return dft2D(image);
 
-    if(image.size.height() == 1 && image.size.width() == 1)
-        return image;
+    if(image.size.width() == 1 || image.size.height() == 1)
+        return dft2D(image);
 
     // dividing image into 4 subimages based on parity of indexes
     ComplexImage subimages[2][2];
@@ -74,10 +76,24 @@ ComplexImage fft2D(const ComplexImage &image)
 }
 
 // discrete Fourier transform calculated from the definition
-
 ComplexImage dft2D(const ComplexImage &image)
 {
-    return image;
+    ComplexImage DFT(image.size);
+    COMPLEX_DOUBLE omegaWidth = omega(image.size.width());
+    COMPLEX_DOUBLE omegaHeight = omega(image.size.height());
+
+    for(int k1 = 0; k1 < image.size.height(); ++k1)
+        for(int k2 = 0; k2 < image.size.width(); ++k2)
+        {
+            ComplexColor sum;
+            for(int n1 = 0; n1 < image.size.height(); ++n1)
+                for(int n2 = 0; n2 < image.size.width(); ++n2)
+                    sum = sum + image.getColor(n1, n2) * pow(omegaHeight, -k1*n1) * pow(omegaWidth, -k2*n2);
+
+            DFT.setColor(k1, k2, sum);
+        }
+
+    return DFT;
 }
 
 COMPLEX_DOUBLE swapComplex(const COMPLEX_DOUBLE &x)

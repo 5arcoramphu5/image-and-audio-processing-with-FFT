@@ -42,6 +42,7 @@ else()
             utils/fourier.h utils/fourier.cpp
             utils/complex_image.h utils/complex_image.cpp
             utils/complex_color.h utils/complex_color.cpp
+            resources.qrc
 
         )
     endif()

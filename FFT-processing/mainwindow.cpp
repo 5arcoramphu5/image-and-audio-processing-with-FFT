@@ -12,10 +12,16 @@
 #include <QMovie>
 #include <QtConcurrent/QtConcurrent>
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow), loadingGif("/home/sarcoramphus/Documents/kod/image-and-audio-processing-with-FFT/FFT-processing/graphics/loading2.gif")
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow), loadingGif(":/graphics/loading.gif")
 {
     ui->setupUi(this);
-    loadingGif.setScaledSize(QSize(100, 100));
+
+    images[0] = ui->unprocessedImage;
+    images[1] = ui->processedImage;
+    images[2] = ui->unprocessedImageDFT;
+    images[3] = ui->processedImageDFT;
+
+    loadingGif.setScaledSize(QSize(50, 50));
 }
 
 MainWindow::~MainWindow()
@@ -25,13 +31,26 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_applyButton_clicked()
 {
-    processWithFFT(dft, processedDFT, processedImage);
-    showImages();
+    displayAsLoading(ui->processedImageDFT, loadingGif);
+    displayAsLoading(ui->processedImage, loadingGif);
+    loadingGif.start();
+
+    auto watcher = new QFutureWatcher<void>(this);
+    connect(watcher, &QFutureWatcher<void>::finished,
+        [watcher, this] ()
+    {
+        watcher->deleteLater();
+        showImages();
+    });
+
+    watcher->setFuture(QtConcurrent::run(this, &MainWindow::performFFTProcessing));
 }
 
 void MainWindow::on_uploadButton_clicked()
 {
     image = openImageFromFileExplorer(this);
+
+    setScaledImages(false);
     setImagesLoading();
 
     auto watcher = new QFutureWatcher<void>(this);
@@ -39,8 +58,6 @@ void MainWindow::on_uploadButton_clicked()
         [watcher, this] ()
     {
         watcher->deleteLater();
-
-        setScaledImages(false);
         showImages();
     });
 
@@ -65,27 +82,25 @@ void MainWindow::showImages()
 
 void MainWindow::setScaledImages(bool scaled)
 {
-    ui->unprocessedImage->setScaledContents(scaled);
-    ui->unprocessedImageDFT->setScaledContents(scaled);
-    ui->processedImage->setScaledContents(scaled);
-    ui->processedImageDFT->setScaledContents(scaled);
+    for (QLabel* label : images)
+        label->setScaledContents(scaled);
 }
 
 void MainWindow::setImagesLoading()
 {
-    ui->unprocessedImage->setMovie(&loadingGif);
-    ui->unprocessedImageDFT->setMovie(&loadingGif);
-    ui->processedImage->setMovie(&loadingGif);
-    ui->processedImageDFT->setMovie(&loadingGif);
-    ui->unprocessedImage->show();
-    ui->unprocessedImageDFT->show();
-    ui->processedImage->show();
-    ui->processedImageDFT->show();
+    for (QLabel* label : images)
+        displayAsLoading(label, loadingGif);
+
     loadingGif.start();
 }
 
 void MainWindow::on_saveButton_clicked()
 {
     saveImageToDistFromFileExplorer(processedImage, this);
+}
+
+void MainWindow::performFFTProcessing()
+{
+    processWithFFT(dft, processedDFT, processedImage);
 }
 

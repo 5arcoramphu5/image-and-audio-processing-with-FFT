@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QMovie>
+#include <QLabel>
 #include "utils/complex_image.h"
 
 QT_BEGIN_NAMESPACE
@@ -26,6 +27,7 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+    QLabel* images[4];
 
     QImage image;
     QImage processedImage;
@@ -40,5 +42,6 @@ private:
     void loadImagesAndDFTs(QImage& image);
     void setScaledImages(bool scaled);
     void setImagesLoading();
+    void performFFTProcessing();
 };
 #endif // MAINWINDOW_H
