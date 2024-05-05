@@ -2,6 +2,7 @@
 #include "./ui_mainwindow.h"
 #include "utils/image_utils.h"
 #include "utils/fourier.h"
+#include "utils/widgets_utils.h"
 
 #include <QFileDialog>
 #include <QImage>
@@ -12,7 +13,11 @@
 #include <QMovie>
 #include <QtConcurrent/QtConcurrent>
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow), loadingGif(":/graphics/loading.gif")
+MainWindow::MainWindow(QWidget *parent) :
+    QMainWindow(parent),
+    ui(new Ui::MainWindow),
+    loadingGif(":/graphics/loading.gif"),
+    imageUploaded(false)
 {
     ui->setupUi(this);
 
@@ -22,6 +27,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     images[3] = ui->processedImageDFT;
 
     loadingGif.setScaledSize(QSize(50, 50));
+
+    initializeFiltersSelection();
 }
 
 MainWindow::~MainWindow()
@@ -29,8 +36,16 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::initializeFiltersSelection()
+{
+    ui->filterSelectionComboBox->addItems(filters.imageFilterNamesList());
+}
+
 void MainWindow::on_applyButton_clicked()
 {
+    if(!imageUploaded)
+        return;
+
     displayAsLoading(ui->processedImageDFT, loadingGif);
     displayAsLoading(ui->processedImage, loadingGif);
     loadingGif.start();
@@ -59,6 +74,7 @@ void MainWindow::on_uploadButton_clicked()
     {
         watcher->deleteLater();
         showImages();
+        imageUploaded = true;
     });
 
     watcher->setFuture(QtConcurrent::run(this, &MainWindow::loadImagesAndDFTs, image));
@@ -102,5 +118,11 @@ void MainWindow::on_saveButton_clicked()
 void MainWindow::performFFTProcessing()
 {
     processWithFFT(dft, processedDFT, processedImage);
+}
+
+void MainWindow::on_filterSelectionComboBox_currentIndexChanged(int index)
+{
+    deleteAllChildren(*ui->parameters_group);
+    filters.insertParametersUI(index, *ui->parameters_layout);
 }
 

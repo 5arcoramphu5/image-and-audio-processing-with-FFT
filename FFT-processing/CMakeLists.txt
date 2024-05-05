@@ -43,6 +43,9 @@ else()
             utils/complex_image.h utils/complex_image.cpp
             utils/complex_color.h utils/complex_color.cpp
             resources.qrc
+            utils/filters.h utils/filters.cpp
+            utils/filter.h utils/filter.cpp
+            utils/widgets_utils.h utils/widgets_utils.cpp
 
         )
     endif()
