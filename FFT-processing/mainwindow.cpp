@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include "utils/image_utils.h"
-#include "utils/fourier.h"
+#include "fourier/fourier.h"
 #include "utils/widgets_utils.h"
 
 #include <QFileDialog>
@@ -84,7 +84,7 @@ void MainWindow::loadImagesAndDFTs(QImage& image)
 {
     dft = fft2D(image);
     imageDFT = dft.toImageFromAbs();
-    processedDFT = imageDFT;
+    processedDFTImage = imageDFT;
     processedImage = image;
 }
 
@@ -93,7 +93,7 @@ void MainWindow::showImages()
     showImage(image, *(ui->unprocessedImage));
     showImage(imageDFT, *(ui->unprocessedImageDFT));
     showImage(processedImage, *(ui->processedImage));
-    showImage(processedDFT, *(ui->processedImageDFT));
+    showImage(processedDFTImage, *(ui->processedImageDFT));
 }
 
 void MainWindow::setScaledImages(bool scaled)
@@ -117,12 +117,18 @@ void MainWindow::on_saveButton_clicked()
 
 void MainWindow::performFFTProcessing()
 {
-    processWithFFT(dft, processedDFT, processedImage);
+    ComplexImage processedDFT(dft);
+
+    filters.performFiltering(processedDFT);
+
+    ComplexImage ifft = ifft2D(processedDFT);
+    processedDFTImage = processedDFT.toImageFromAbs();
+    processedImage = ifft.toImageFromReal();
 }
 
 void MainWindow::on_filterSelectionComboBox_currentIndexChanged(int index)
 {
     deleteAllChildren(*ui->parameters_group);
-    filters.insertParametersUI(index, *ui->parameters_layout);
+    filters.setIndex(index);
+    filters.insertParametersUI(*ui->parameters_layout);
 }
-

@@ -4,8 +4,8 @@
 #include <QMainWindow>
 #include <QMovie>
 #include <QLabel>
-#include "utils/complex_image.h"
-#include "utils/filters.h"
+#include "fourier/complex_image.h"
+#include "filters/filters.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -36,7 +36,7 @@ private:
     QImage image;
     QImage processedImage;
     QImage imageDFT;
-    QImage processedDFT;
+    QImage processedDFTImage;
 
     ComplexImage dft;
 

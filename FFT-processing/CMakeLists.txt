@@ -39,13 +39,14 @@ else()
         add_executable(FFT-processing
             ${PROJECT_SOURCES}
             utils/image_utils.h utils/image_utils.cpp
-            utils/fourier.h utils/fourier.cpp
-            utils/complex_image.h utils/complex_image.cpp
-            utils/complex_color.h utils/complex_color.cpp
+            fourier/fourier.h fourier/fourier.cpp
+            fourier/complex_image.h fourier/complex_image.cpp
+            fourier/complex_color.h fourier/complex_color.cpp
             resources.qrc
-            utils/filters.h utils/filters.cpp
-            utils/filter.h utils/filter.cpp
+            filters/filters.h filters/filters.cpp
+            filters/filter.h filters/filter.cpp
             utils/widgets_utils.h utils/widgets_utils.cpp
+            filters/abstract_filters.h filters/abstract_filters.cpp
 
         )
     endif()
