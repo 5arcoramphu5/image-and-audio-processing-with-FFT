@@ -7,8 +7,8 @@
 
 QSlider* createSlider(int initialValue);
 
-void deleteAllChildren(QObject &object);
-
 QLabel* createLabel(QString text);
+
+void deleteAllChildren(QObject &object);
 
 #endif // WIDGETS_UTILS_H

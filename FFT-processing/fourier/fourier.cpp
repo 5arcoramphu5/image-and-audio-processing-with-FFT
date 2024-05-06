@@ -129,3 +129,26 @@ ComplexImage ifft2D(const ComplexImage &image)
 
     return dft;
 }
+
+// moving lower frequency components to the center
+ComplexImage fftShift(const ComplexImage &image)
+{
+    ComplexImage shiftedImage(image);
+
+    int halfHeight = image.size.height() / 2;
+    int halfWidth = image.size.width() / 2;
+
+    for(int i = 0; i < halfHeight; ++i)
+        for(int j = 0; j < halfWidth; ++j)
+        {
+            // swapping upper left and lower right quarter
+            shiftedImage.setColor(i, j, image.getColor(i + halfHeight, j + halfWidth));
+            shiftedImage.setColor(i + halfHeight, j + halfWidth, image.getColor(i, j));
+
+            // swapping upper right and lowej left quarter
+            shiftedImage.setColor(i, j + halfWidth, image.getColor(i + halfHeight, j));
+            shiftedImage.setColor(i + halfHeight, j, image.getColor(i, j + halfWidth));
+        }
+
+    return shiftedImage;
+}

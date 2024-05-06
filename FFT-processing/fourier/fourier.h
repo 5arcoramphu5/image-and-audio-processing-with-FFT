@@ -11,4 +11,6 @@ ComplexImage fft2D(const QImage &image);
 
 ComplexImage ifft2D(const ComplexImage &image);
 
+ComplexImage fftShift(const ComplexImage &image);
+
 #endif // FOURIER_H

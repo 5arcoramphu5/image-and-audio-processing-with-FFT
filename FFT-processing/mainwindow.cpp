@@ -83,7 +83,7 @@ void MainWindow::on_uploadButton_clicked()
 void MainWindow::loadImagesAndDFTs(QImage& image)
 {
     dft = fft2D(image);
-    imageDFT = dft.toImageFromAbs();
+    imageDFT = fftShift(dft).toImageFromAbs();
     processedDFTImage = imageDFT;
     processedImage = image;
 }
@@ -117,12 +117,12 @@ void MainWindow::on_saveButton_clicked()
 
 void MainWindow::performFFTProcessing()
 {
-    ComplexImage processedDFT(dft);
-
+    ComplexImage processedDFT = fftShift(dft);
     filters.performFiltering(processedDFT);
+    processedDFT = fftShift(processedDFT);
 
+    processedDFTImage = fftShift(processedDFT).toImageFromAbs();
     ComplexImage ifft = ifft2D(processedDFT);
-    processedDFTImage = processedDFT.toImageFromAbs();
     processedImage = ifft.toImageFromReal();
 }
 

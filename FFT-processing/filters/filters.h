@@ -23,10 +23,9 @@ class Filters
 
     private:
 
-        static const int N = 3;
+        static const int N = 2;
         ImageFilter* imageFilters[N] = {
             new BlurFilter(),
-            new SharpenFilter(),
             new EdgeDetectionFilter()
         };
 
