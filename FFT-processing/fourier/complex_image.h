@@ -23,14 +23,16 @@ class ComplexImage
         ComplexImage(const QSize &size);
         ComplexImage(const QImage &image);
 
-        QImage toImageFromAbs() const;
-        QImage toImageFromReal() const;
+        QImage toImageFromAbs(bool normalized, double maxRed = 1, double maxGreen = 1, double maxBlue = 1) const;
+        QImage toImageFromReal(bool normalized, double maxRed = 1, double maxGreen = 1, double maxBlue = 1) const;
 
         void setColor(int i, int j, const ComplexColor &color);
         ComplexColor getColor(int i, int j) const;
 
+        void maxAbsValuesExcludingCenter(double &maxRed, double &maxGreen, double &maxBlue);
+
     private:
-        QImage toImage(complexToDouble convert) const;
+        QImage toImage(complexToDouble convert, bool normalized, double maxRed = 1, double maxGreen = 1, double maxBlue = 1) const;
         bool isInsideImage(int i, int j) const;
 };
 #endif // COMPLEX_IMAGE_H

@@ -28,6 +28,7 @@ void saveImageToDistFromFileExplorer(QImage &image, QWidget *parent)
 
 void displayAsLoading(QLabel* label, QMovie &movie)
 {
+    label->setPixmap(QPixmap());
     label->setMovie(&movie);
     label->show();
 }

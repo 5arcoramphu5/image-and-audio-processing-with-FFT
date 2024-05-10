@@ -83,7 +83,10 @@ void MainWindow::on_uploadButton_clicked()
 void MainWindow::loadImagesAndDFTs(QImage& image)
 {
     dft = fft2D(image);
-    imageDFT = fftShift(dft).toImageFromAbs();
+    ComplexImage shiftedDFT = fftShift(dft);
+    shiftedDFT.maxAbsValuesExcludingCenter(maxRed, maxGreen, maxBlue);
+
+    imageDFT = shiftedDFT.toImageFromAbs(true, maxRed, maxGreen, maxBlue);
     processedDFTImage = imageDFT;
     processedImage = image;
 }
@@ -121,9 +124,9 @@ void MainWindow::performFFTProcessing()
     filters.performFiltering(processedDFT);
     processedDFT = fftShift(processedDFT);
 
-    processedDFTImage = fftShift(processedDFT).toImageFromAbs();
+    processedDFTImage = fftShift(processedDFT).toImageFromAbs(true, maxRed, maxGreen, maxBlue);
     ComplexImage ifft = ifft2D(processedDFT);
-    processedImage = ifft.toImageFromReal();
+    processedImage = ifft.toImageFromReal(false);
 }
 
 void MainWindow::on_filterSelectionComboBox_currentIndexChanged(int index)

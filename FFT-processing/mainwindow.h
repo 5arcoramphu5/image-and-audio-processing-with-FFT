@@ -44,6 +44,9 @@ private:
 
     Filters filters;
 
+    // normalizing DFT
+    double maxRed, maxGreen, maxBlue;
+
     void showImages();
     void loadImagesAndDFTs(QImage& image);
     void setScaledImages(bool scaled);
