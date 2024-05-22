@@ -1,8 +1,10 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include "utils/image_utils.h"
+#include "utils/audio_utils.h"
 #include "fourier/fourier.h"
 #include "utils/widgets_utils.h"
+#include "utils/mode.h"
 
 #include <QFileDialog>
 #include <QImage>
@@ -17,18 +19,18 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     loadingGif(":/graphics/loading.gif"),
-    imageUploaded(false)
+    isImageUploaded(false),
+    isAudioUploaded(false)
 {
     ui->setupUi(this);
+    loadingGif.setScaledSize(QSize(50, 50));
+
+    on_tabWidget_currentChanged(ui->tabWidget->currentIndex());
 
     images[0] = ui->unprocessedImage;
     images[1] = ui->processedImage;
     images[2] = ui->unprocessedImageDFT;
     images[3] = ui->processedImageDFT;
-
-    loadingGif.setScaledSize(QSize(50, 50));
-
-    initializeFiltersSelection();
 }
 
 MainWindow::~MainWindow()
@@ -36,48 +38,87 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::initializeFiltersSelection()
+void MainWindow::updateFiltersSelection()
 {
-    ui->filterSelectionComboBox->addItems(filters.imageFilterNamesList());
+    ui->filterSelectionComboBox->clear();
+    ui->filterSelectionComboBox->addItems(filters.filterNamesList());
 }
 
 void MainWindow::on_applyButton_clicked()
 {
-    if(!imageUploaded)
-        return;
-
-    displayAsLoading(ui->processedImageDFT, loadingGif);
-    displayAsLoading(ui->processedImage, loadingGif);
-    loadingGif.start();
-
-    auto watcher = new QFutureWatcher<void>(this);
-    connect(watcher, &QFutureWatcher<void>::finished,
-        [watcher, this] ()
+    switch(mode)
     {
-        watcher->deleteLater();
-        showImages();
-    });
+        case Mode::IMAGE:
+        {
+            if(!isImageUploaded)
+                return;
 
-    watcher->setFuture(QtConcurrent::run(this, &MainWindow::performFFTProcessing));
+            displayAsLoading(ui->processedImageDFT, loadingGif);
+            displayAsLoading(ui->processedImage, loadingGif);
+            loadingGif.start();
+
+            auto watcher = new QFutureWatcher<void>(this);
+            connect(watcher, &QFutureWatcher<void>::finished,
+                [watcher, this] ()
+            {
+                watcher->deleteLater();
+                showImages();
+            });
+
+            watcher->setFuture(QtConcurrent::run(this, &MainWindow::processImageWithFFT));
+        }
+        break;
+
+        case Mode::AUDIO:
+        {
+            qDebug() << "process audio";
+            // auto watcher = new QFutureWatcher<void>(this);
+            // connect(watcher, &QFutureWatcher<void>::finished,
+            //     [watcher, this] ()
+            // {
+            //     watcher->deleteLater();
+            //     // TODO
+            // });
+
+            // watcher->setFuture(QtConcurrent::run(this, &MainWindow::processAudioWithFFT));
+        }
+        break;
+    }
 }
 
 void MainWindow::on_uploadButton_clicked()
 {
-    image = openImageFromFileExplorer(this);
-
-    setScaledImages(false);
-    setImagesLoading();
-
-    auto watcher = new QFutureWatcher<void>(this);
-    connect(watcher, &QFutureWatcher<void>::finished,
-        [watcher, this] ()
+    switch(mode)
     {
-        watcher->deleteLater();
-        showImages();
-        imageUploaded = true;
-    });
+        case Mode::IMAGE:
+        {
+            image = openImageFromFileExplorer(this);
 
-    watcher->setFuture(QtConcurrent::run(this, &MainWindow::loadImagesAndDFTs, image));
+            for (QLabel* label : images)
+                label->setScaledContents(false);
+
+            setImagesLoading();
+
+            auto watcher = new QFutureWatcher<void>(this);
+            connect(watcher, &QFutureWatcher<void>::finished,
+                [watcher, this] ()
+            {
+                watcher->deleteLater();
+                showImages();
+                isImageUploaded = true;
+            });
+
+            watcher->setFuture(QtConcurrent::run(this, &MainWindow::loadImagesAndDFTs, image));
+        }
+        break;
+
+        case Mode::AUDIO:
+        {
+            qDebug() << "upload audio";
+            // TODO
+        }
+        break;
+    }
 }
 
 void MainWindow::loadImagesAndDFTs(QImage& image)
@@ -99,12 +140,6 @@ void MainWindow::showImages()
     showImage(processedDFTImage, *(ui->processedImageDFT));
 }
 
-void MainWindow::setScaledImages(bool scaled)
-{
-    for (QLabel* label : images)
-        label->setScaledContents(scaled);
-}
-
 void MainWindow::setImagesLoading()
 {
     for (QLabel* label : images)
@@ -115,18 +150,26 @@ void MainWindow::setImagesLoading()
 
 void MainWindow::on_saveButton_clicked()
 {
-    saveImageToDistFromFileExplorer(processedImage, this);
+    if(mode == Mode::IMAGE)
+        saveImageToDistFromFileExplorer(processedImage, this);
+    else
+        saveAudioToDistFromFileExplorer(this);
 }
 
-void MainWindow::performFFTProcessing()
+void MainWindow::processImageWithFFT()
 {
     ComplexImage processedDFT = fftShift(dft);
-    filters.performFiltering(processedDFT);
+    filters.performImageFiltering(processedDFT);
     processedDFT = fftShift(processedDFT);
 
     processedDFTImage = fftShift(processedDFT).toImageFromAbs(true, maxRed, maxGreen, maxBlue);
     ComplexImage ifft = ifft2D(processedDFT);
     processedImage = ifft.toImageFromReal(false);
+}
+
+void MainWindow::processAudioWithFFT()
+{
+    // TODO
 }
 
 void MainWindow::on_filterSelectionComboBox_currentIndexChanged(int index)
@@ -135,3 +178,11 @@ void MainWindow::on_filterSelectionComboBox_currentIndexChanged(int index)
     filters.setIndex(index);
     filters.insertParametersUI(*ui->parameters_layout);
 }
+
+void MainWindow::on_tabWidget_currentChanged(int index)
+{
+    mode = index == 0 ? Mode::IMAGE : Mode::AUDIO;
+    filters.setMode(mode);
+    updateFiltersSelection();
+}
+

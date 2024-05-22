@@ -47,6 +47,8 @@ else()
             filters/filter.h filters/filter.cpp
             utils/widgets_utils.h utils/widgets_utils.cpp
             filters/abstract_filters.h filters/abstract_filters.cpp
+            utils/mode.h
+            utils/audio_utils.h utils/audio_utils.cpp
 
         )
     endif()

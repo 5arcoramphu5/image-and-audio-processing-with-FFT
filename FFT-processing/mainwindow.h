@@ -6,6 +6,7 @@
 #include <QLabel>
 #include "fourier/complex_image.h"
 #include "filters/filters.h"
+#include "utils/mode.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -28,11 +29,25 @@ private slots:
 
     void on_filterSelectionComboBox_currentIndexChanged(int index);
 
+    void on_tabWidget_currentChanged(int index);
+
 private:
     Ui::MainWindow *ui;
+
+    QMovie loadingGif;
+
+    Filters filters;
+
+    Mode mode;
+
+    void updateFiltersSelection();
+
+    //  __________________
+    // |___ IMAGES TAB ___|
+
     QLabel* images[4];
 
-    bool imageUploaded;
+    bool isImageUploaded;
     QImage image;
     QImage processedImage;
     QImage imageDFT;
@@ -40,18 +55,19 @@ private:
 
     ComplexImage dft;
 
-    QMovie loadingGif;
-
-    Filters filters;
-
     // normalizing DFT
     double maxRed, maxGreen, maxBlue;
 
     void showImages();
     void loadImagesAndDFTs(QImage& image);
-    void setScaledImages(bool scaled);
     void setImagesLoading();
-    void performFFTProcessing();
-    void initializeFiltersSelection();
+    void processImageWithFFT();
+
+    //  _________________
+    // |___ AUDIO TAB ___|
+
+    bool isAudioUploaded;
+
+    void processAudioWithFFT();
 };
 #endif // MAINWINDOW_H

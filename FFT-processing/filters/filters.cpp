@@ -1,27 +1,39 @@
 #include "filters.h"
 
+#include <QDebug>
+
 Filters::Filters()
 { }
 
 Filters::~Filters()
 {
-    for(int i = 0; i < N; ++i)
+    for(int i = 0; i < IMAGE_N; ++i)
         delete imageFilters[i];
+
+    for(int i = 0; i < AUDIO_N; ++i)
+        delete audioFilters[i];
 }
 
 
-QStringList Filters::imageFilterNamesList() const
+QStringList Filters::filterNamesList() const
 {
     QStringList names;
-    for (Filter *filter : imageFilters) {
-        names << filter->displayName;
+    if(mode == Mode::IMAGE)
+    {
+        for (Filter *filter : imageFilters)
+            names << filter->displayName;
+    } else
+    {
+        for (Filter *filter : audioFilters)
+            names << filter->displayName;
     }
+
     return names;
 }
 
 bool Filters::indexValid(int index)
 {
-    return index >= 0 && index < N;
+    return index >= 0 && index < (mode == Mode::IMAGE ? IMAGE_N : AUDIO_N);
 }
 
 void Filters::setIndex(int index)
@@ -30,12 +42,32 @@ void Filters::setIndex(int index)
         currentIndex = index;
 }
 
-void Filters::insertParametersUI(QLayout &layout) const
+void Filters::setMode(Mode _mode)
 {
-    imageFilters[currentIndex]->insertParametersUI(layout);
+    mode = _mode;
 }
 
-void Filters::performFiltering(ComplexImage &dft) const
+void Filters::insertParametersUI(QLayout &layout) const
 {
+    if(mode == Mode::IMAGE)
+        imageFilters[currentIndex]->insertParametersUI(layout);
+    else
+        audioFilters[currentIndex]->insertParametersUI(layout);
+}
+
+void Filters::performImageFiltering(ComplexImage &dft) const
+{
+    if(mode != Mode::IMAGE)
+    {
+        qDebug() << "not in image mode";
+        return;
+    }
+
     imageFilters[currentIndex]->performFiltering(dft);
+}
+
+
+void Filters::performAudioFiltering() const
+{
+    qDebug() << "audio filtering...";
 }

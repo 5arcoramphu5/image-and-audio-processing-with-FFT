@@ -49,9 +49,5 @@ void EdgeDetectionFilter::performFiltering(ComplexImage &dft)
             if( x*x + y*y < 1)
                 dft.setColor(i, j, zero);
         }
-
-    // for(int i = middleX - radiusX; i < middleX + radiusX; ++i)
-    //     for(int j = middleY - radiusY; j < middleY + radiusY; ++j)
-    //         dft.setColor(i, j, zero);
 }
 

@@ -8,6 +8,7 @@ QSlider* createSlider(int initialValue)
     slider->setMaximum(99);
     slider->setMinimum(0);
     slider->setValue(initialValue);
+    // slider->setMaximumHeight(20);
 
     return slider;
 }
@@ -16,6 +17,7 @@ QLabel* createLabel(QString text)
 {
     QLabel* label = new QLabel();
     label->setText(text);
+    // label->setMaximumHeight(20);
     return label;
 }
 
