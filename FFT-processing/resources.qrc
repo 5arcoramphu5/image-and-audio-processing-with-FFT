@@ -1,5 +1,9 @@
 <RCC>
     <qresource prefix="/">
         <file>graphics/loading.gif</file>
+        <file>graphics/speaker-icon.png</file>
+        <file>graphics/speaker-muted-icon.png</file>
+        <file>graphics/play-icon.png</file>
+        <file>graphics/pause-icon.png</file>
     </qresource>
 </RCC>

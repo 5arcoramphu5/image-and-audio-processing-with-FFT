@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1012</width>
-    <height>927</height>
+    <width>912</width>
+    <height>552</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -288,11 +288,11 @@
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
+              <property name="styleSheet">
+               <string notr="true">QLabel { background-color : rgb(232, 232, 232) }</string>
+              </property>
               <property name="text">
                <string/>
-              </property>
-              <property name="pixmap">
-               <pixmap>../../../../../../run/user/1000/doc/4189995d/gray.png</pixmap>
               </property>
               <property name="scaledContents">
                <bool>true</bool>
@@ -307,15 +307,15 @@
             </item>
            </layout>
           </item>
-          <item row="0" column="1">
-           <layout class="QVBoxLayout" name="processedDFTLayout">
+          <item row="1" column="1">
+           <layout class="QVBoxLayout" name="processedImageLayout">
             <property name="spacing">
              <number>3</number>
             </property>
             <item>
-             <widget class="QLabel" name="label_2">
+             <widget class="QLabel" name="label_4">
               <property name="text">
-               <string>processed DFT</string>
+               <string>processed image</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignCenter</set>
@@ -323,18 +323,21 @@
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="processedImageDFT">
+             <widget class="QLabel" name="processedImage">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
+              <property name="layoutDirection">
+               <enum>Qt::LeftToRight</enum>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QLabel { background-color : rgb(232, 232, 232) }</string>
+              </property>
               <property name="text">
                <string/>
-              </property>
-              <property name="pixmap">
-               <pixmap>../../../../../../run/user/1000/doc/4189995d/gray.png</pixmap>
               </property>
               <property name="scaledContents">
                <bool>true</bool>
@@ -369,11 +372,11 @@
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
+              <property name="styleSheet">
+               <string notr="true">QLabel { background-color : rgb(232, 232, 232) }</string>
+              </property>
               <property name="text">
                <string/>
-              </property>
-              <property name="pixmap">
-               <pixmap>../../../../../../run/user/1000/doc/4189995d/gray.png</pixmap>
               </property>
               <property name="scaledContents">
                <bool>true</bool>
@@ -385,15 +388,15 @@
             </item>
            </layout>
           </item>
-          <item row="1" column="1">
-           <layout class="QVBoxLayout" name="processedImageLayout">
+          <item row="0" column="1">
+           <layout class="QVBoxLayout" name="processedDFTLayout">
             <property name="spacing">
              <number>3</number>
             </property>
             <item>
-             <widget class="QLabel" name="label_4">
+             <widget class="QLabel" name="label_2">
               <property name="text">
-               <string>processed image</string>
+               <string>processed DFT</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignCenter</set>
@@ -401,21 +404,18 @@
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="processedImage">
+             <widget class="QLabel" name="processedImageDFT">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
-              <property name="layoutDirection">
-               <enum>Qt::LeftToRight</enum>
+              <property name="styleSheet">
+               <string notr="true">QLabel { background-color : rgb(232, 232, 232) }</string>
               </property>
               <property name="text">
                <string/>
-              </property>
-              <property name="pixmap">
-               <pixmap>../../../../../../run/user/1000/doc/4189995d/gray.png</pixmap>
               </property>
               <property name="scaledContents">
                <bool>true</bool>
@@ -441,7 +441,254 @@
        <attribute name="title">
         <string>audio</string>
        </attribute>
-       <layout class="QHBoxLayout" name="horizontalLayout_3"/>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout">
+          <property name="spacing">
+           <number>10</number>
+          </property>
+          <property name="leftMargin">
+           <number>10</number>
+          </property>
+          <property name="topMargin">
+           <number>10</number>
+          </property>
+          <property name="rightMargin">
+           <number>10</number>
+          </property>
+          <property name="bottomMargin">
+           <number>10</number>
+          </property>
+          <item>
+           <layout class="QVBoxLayout" name="originalAudioLayout">
+            <property name="spacing">
+             <number>15</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>15</number>
+            </property>
+            <item>
+             <layout class="QHBoxLayout" name="originalAudioControls">
+              <property name="spacing">
+               <number>10</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="originalAudioLabel">
+                <property name="text">
+                 <string>original audio</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="originalAudioMute">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">QCheckBox::indicator:unchecked {
+    image: url(:/graphics/speaker-icon.png);
+}
+
+QCheckBox::indicator:checked {
+    image: url(:/graphics/speaker-muted-icon.png);
+}</string>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSlider" name="originalAudioVolume">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="value">
+                 <number>50</number>
+                </property>
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QLabel" name="originalAudioVIsualisation">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QLabel { background-color : rgb(232, 232, 232) }</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="filteredAudioLayout">
+            <property name="spacing">
+             <number>15</number>
+            </property>
+            <property name="bottomMargin">
+             <number>15</number>
+            </property>
+            <item>
+             <layout class="QHBoxLayout" name="filteredAudioControls">
+              <property name="spacing">
+               <number>10</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="filteredAudioLabel">
+                <property name="text">
+                 <string>filtered audio</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="filteredAudioMute">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">QCheckBox::indicator:unchecked {
+    image: url(:/graphics/speaker-icon.png);
+}
+
+QCheckBox::indicator:checked {
+    image: url(:/graphics/speaker-muted-icon.png);
+}</string>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSlider" name="filteredAudioVolume">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="value">
+                 <number>50</number>
+                </property>
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QLabel" name="filteredAudioVisualisation">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QLabel { background-color : rgb(232, 232, 232) }</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="commonAudioControls">
+            <property name="spacing">
+             <number>10</number>
+            </property>
+            <property name="leftMargin">
+             <number>15</number>
+            </property>
+            <property name="rightMargin">
+             <number>15</number>
+            </property>
+            <item>
+             <widget class="QCheckBox" name="playButton">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QCheckBox::indicator:unchecked {
+    image: url(:/graphics/play-icon.png);
+}
+
+QCheckBox::indicator:checked {
+    image: url(:/graphics/pause-icon.png);
+}</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="currentTime">
+              <property name="text">
+               <string>--:--</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSlider" name="audioTimeSlider">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="audioLength">
+              <property name="text">
+               <string>--:--</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>

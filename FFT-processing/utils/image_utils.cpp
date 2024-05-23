@@ -14,7 +14,7 @@ void showImage(QImage &image, QLabel &label)
 
 QImage openImageFromFileExplorer(QWidget *parent)
 {
-    QString fileName = QFileDialog::getOpenFileName(parent, "Open File", QString(), "Images (*.png *.xpm *.jpg *.bmp)");
+    QString fileName = QFileDialog::getOpenFileName(parent, "Open Image", QString(), "Images (*.png *.xpm *.jpg *.bmp)");
     return QImage(fileName);
 }
 

@@ -114,7 +114,7 @@ void MainWindow::on_uploadButton_clicked()
 
         case Mode::AUDIO:
         {
-            qDebug() << "upload audio";
+            openAudioFromFileExplorer(this);
             // TODO
         }
         break;
