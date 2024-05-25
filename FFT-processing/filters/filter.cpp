@@ -51,3 +51,6 @@ void EdgeDetectionFilter::performFiltering(ComplexImage &dft)
         }
 }
 
+EqualizerFilter::EqualizerFilter(const int N): MultipleHorizontalSlidersAudioFilter(N, 50, "Equalizer")
+{}
+

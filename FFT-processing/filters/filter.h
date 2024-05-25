@@ -20,4 +20,11 @@ public:
 
 // AUDIO FILTERS
 
+class EqualizerFilter: public MultipleHorizontalSlidersAudioFilter
+{
+public:
+    EqualizerFilter(const int N);
+
+};
+
 #endif // FILTER_H

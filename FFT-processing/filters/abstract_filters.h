@@ -3,7 +3,7 @@
 
 #include "../fourier/complex_image.h"
 
-#include <QLayout>
+#include <QBoxLayout>
 #include <QSlider>
 #include <QWidget>
 
@@ -14,7 +14,7 @@ public:
 
     QString displayName;
 
-    virtual void insertParametersUI(QLayout &layout) = 0;
+    virtual void insertParametersUI(QBoxLayout &layout) = 0;
 };
 
 
@@ -33,7 +33,7 @@ class AudioFilter : public Filter
 public:
     AudioFilter(QString _displayName);
 
-    // virtual void performFiltering() = 0;
+    virtual void performFiltering() = 0;
 };
 
 // BY PARAMETERS TYPE
@@ -43,9 +43,11 @@ class OneParameterImageFilter : public ImageFilter
 
 public:
     OneParameterImageFilter(int _initialValue, QString _displayName);
+    ~OneParameterImageFilter();
+
     double getParameterValue() const;
 
-    void insertParametersUI(QLayout &layout);
+    void insertParametersUI(QBoxLayout &layout);
 
 private:
     int initialValue;
@@ -56,13 +58,33 @@ class OneParameterAudioFilter : public AudioFilter
 {
 public:
     OneParameterAudioFilter(int _initialValue, QString _displayName);
+    ~OneParameterAudioFilter();
+
     double getParameterValue() const;
 
-    void insertParametersUI(QLayout &layout);
+    void insertParametersUI(QBoxLayout &layout);
 
 private:
     int initialValue;
     QSlider* slider;
+};
+
+class MultipleHorizontalSlidersAudioFilter: public AudioFilter
+{
+public:
+    MultipleHorizontalSlidersAudioFilter(const int N, const int initialValue, const QString _displayName);
+    ~MultipleHorizontalSlidersAudioFilter();
+
+    double getValueAtIndex(const int i) const;
+
+    void insertParametersUI(QBoxLayout &layout);
+
+    void performFiltering();
+
+private:
+    const int N;
+    const int initialValue;
+    QSlider** sliders;
 };
 
 #endif // ABSTRACT_FILTER_H

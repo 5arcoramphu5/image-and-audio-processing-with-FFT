@@ -49,7 +49,7 @@ else()
             utils/widgets_utils.h utils/widgets_utils.cpp
             filters/abstract_filters.h filters/abstract_filters.cpp
             utils/mode.h
-            utils/audio_utils.h utils/audio_utils.cpp
+            utils/audio_controller.h utils/audio_controller.cpp
 
         )
     endif()

@@ -5,7 +5,7 @@
 #include <QStringList>
 #include <QString>
 #include <QWidget>
-#include <QLayout>
+#include <QBoxLayout>
 
 #include "../utils/mode.h"
 
@@ -17,7 +17,7 @@ class Filters
 
         QStringList filterNamesList() const;
 
-        void insertParametersUI(QLayout &layout) const;
+        void insertParametersUI(QBoxLayout &layout) const;
 
         void performImageFiltering(ComplexImage &dft) const;
         void performAudioFiltering() const;
@@ -34,10 +34,10 @@ class Filters
             new EdgeDetectionFilter()
         };
 
-        static const int AUDIO_N = 2;
+        static const int AUDIO_N = 1;
         AudioFilter* audioFilters[AUDIO_N] = {
-            new OneParameterAudioFilter(0, "Audio filter 1"),
-            new OneParameterAudioFilter(50, "Audio filter 2")
+            // new OneParameterAudioFilter(0, "Audio filter 1"),
+            new EqualizerFilter(16)
         };
 
         bool indexValid(int index);

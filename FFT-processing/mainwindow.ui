@@ -116,32 +116,7 @@
             </property>
             <layout class="QVBoxLayout" name="parameters_group_layout">
              <item>
-              <layout class="QVBoxLayout" name="parameters_layout">
-               <item>
-                <layout class="QHBoxLayout" name="spinbox_with_slider">
-                 <item>
-                  <widget class="QSlider" name="slider">
-                   <property name="maximum">
-                    <number>1</number>
-                   </property>
-                   <property name="orientation">
-                    <enum>Qt::Horizontal</enum>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QSpinBox" name="spinBox"/>
-                 </item>
-                </layout>
-               </item>
-               <item>
-                <widget class="QSlider" name="horizontalSlider">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                </widget>
-               </item>
-              </layout>
+              <layout class="QVBoxLayout" name="parameters_layout"/>
              </item>
             </layout>
            </widget>

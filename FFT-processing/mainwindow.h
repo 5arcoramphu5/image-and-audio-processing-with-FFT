@@ -7,6 +7,7 @@
 #include "fourier/complex_image.h"
 #include "filters/filters.h"
 #include "utils/mode.h"
+#include "utils/audio_controller.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -67,6 +68,7 @@ private:
     // |___ AUDIO TAB ___|
 
     bool isAudioUploaded;
+    AudioController audioController;
 
     void processAudioWithFFT();
 };

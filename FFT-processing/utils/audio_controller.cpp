@@ -1,10 +1,12 @@
-#include "audio_utils.h"
+#include "audio_controller.h"
 
 #include <QAudioDecoder>
 #include <QFileDialog>
 #include <QAudioBuffer>
 
-void openAudioFromFileExplorer(QWidget *parent)
+AudioController::AudioController() {}
+
+void AudioController::openAudioFromFileExplorer(QWidget *parent)
 {
     QString fileName = QFileDialog::getOpenFileName(parent, "Open Audio File", QString(), "Audio (*.mp3)");
 
@@ -20,5 +22,5 @@ void openAudioFromFileExplorer(QWidget *parent)
     //pAudioDecoder->read();
 }
 
-void saveAudioToDistFromFileExplorer(QWidget *parent)
+void AudioController::saveAudioToDistFromFileExplorer(QWidget *parent)
 {}

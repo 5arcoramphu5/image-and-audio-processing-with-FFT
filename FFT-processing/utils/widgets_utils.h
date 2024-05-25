@@ -5,7 +5,7 @@
 #include <QObject>
 #include <QLabel>
 
-QSlider* createSlider(int initialValue);
+QSlider* createSlider(int initialValue, Qt::Orientation orientation);
 
 QLabel* createLabel(QString text);
 

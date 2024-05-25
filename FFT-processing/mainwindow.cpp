@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include "utils/image_utils.h"
-#include "utils/audio_utils.h"
+#include "utils/audio_controller.h"
 #include "fourier/fourier.h"
 #include "utils/widgets_utils.h"
 #include "utils/mode.h"
@@ -19,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     loadingGif(":/graphics/loading.gif"),
+    audioController(),
     isImageUploaded(false),
     isAudioUploaded(false)
 {
@@ -71,16 +72,15 @@ void MainWindow::on_applyButton_clicked()
 
         case Mode::AUDIO:
         {
-            qDebug() << "process audio";
-            // auto watcher = new QFutureWatcher<void>(this);
-            // connect(watcher, &QFutureWatcher<void>::finished,
-            //     [watcher, this] ()
-            // {
-            //     watcher->deleteLater();
-            //     // TODO
-            // });
+            auto watcher = new QFutureWatcher<void>(this);
+            connect(watcher, &QFutureWatcher<void>::finished,
+                [watcher, this] ()
+            {
+                watcher->deleteLater();
+                // TODO
+            });
 
-            // watcher->setFuture(QtConcurrent::run(this, &MainWindow::processAudioWithFFT));
+            watcher->setFuture(QtConcurrent::run(this, &MainWindow::processAudioWithFFT));
         }
         break;
     }
@@ -114,7 +114,7 @@ void MainWindow::on_uploadButton_clicked()
 
         case Mode::AUDIO:
         {
-            openAudioFromFileExplorer(this);
+            audioController.openAudioFromFileExplorer(this);
             // TODO
         }
         break;
@@ -153,7 +153,7 @@ void MainWindow::on_saveButton_clicked()
     if(mode == Mode::IMAGE)
         saveImageToDistFromFileExplorer(processedImage, this);
     else
-        saveAudioToDistFromFileExplorer(this);
+        audioController.saveAudioToDistFromFileExplorer(this);
 }
 
 void MainWindow::processImageWithFFT()
@@ -169,7 +169,7 @@ void MainWindow::processImageWithFFT()
 
 void MainWindow::processAudioWithFFT()
 {
-    // TODO
+    filters.performAudioFiltering();
 }
 
 void MainWindow::on_filterSelectionComboBox_currentIndexChanged(int index)

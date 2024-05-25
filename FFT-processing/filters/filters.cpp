@@ -47,7 +47,7 @@ void Filters::setMode(Mode _mode)
     mode = _mode;
 }
 
-void Filters::insertParametersUI(QLayout &layout) const
+void Filters::insertParametersUI(QBoxLayout &layout) const
 {
     if(mode == Mode::IMAGE)
         imageFilters[currentIndex]->insertParametersUI(layout);
@@ -69,5 +69,5 @@ void Filters::performImageFiltering(ComplexImage &dft) const
 
 void Filters::performAudioFiltering() const
 {
-    qDebug() << "audio filtering...";
+    audioFilters[currentIndex]->performFiltering();
 }
