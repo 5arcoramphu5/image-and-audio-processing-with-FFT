@@ -28,6 +28,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     on_tabWidget_currentChanged(ui->tabWidget->currentIndex());
 
+    audioController.addFilteredVisualisation(*ui->filteredAudioVisualisation);
+    audioController.addOriginalVisualisation(*ui->originalAudioVisualisation);
+
     images[0] = ui->unprocessedImage;
     images[1] = ui->processedImage;
     images[2] = ui->unprocessedImageDFT;
