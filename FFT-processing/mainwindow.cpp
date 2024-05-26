@@ -89,6 +89,12 @@ void MainWindow::on_applyButton_clicked()
     }
 }
 
+QString trimFileNamePath(QString fileName)
+{
+    return fileName.split("/").last();
+}
+
+
 void MainWindow::on_uploadButton_clicked()
 {
     switch(mode)
@@ -117,7 +123,10 @@ void MainWindow::on_uploadButton_clicked()
 
         case Mode::AUDIO:
         {
-            audioController.openAudioFromFileExplorer(this);
+            QString fileName;
+            audioController.openAudioFromFileExplorer(this, fileName);
+            ui->fileName->setText(trimFileNamePath(fileName));
+
             // TODO
         }
         break;
@@ -187,5 +196,41 @@ void MainWindow::on_tabWidget_currentChanged(int index)
     mode = index == 0 ? Mode::IMAGE : Mode::AUDIO;
     filters.setMode(mode);
     updateFiltersSelection();
+}
+
+void MainWindow::on_playButton_toggled(bool play)
+{
+    if(play)
+        audioController.play();
+    else
+        audioController.pause();
+}
+
+void MainWindow::on_originalAudioVolume_sliderMoved(int value)
+{
+    if(!ui->originalAudioMute->isChecked())
+        audioController.setVolumeOriginal((double)value / 100);
+}
+
+void MainWindow::on_originalAudioMute_toggled(bool mute)
+{
+    if(mute)
+        audioController.setVolumeOriginal(0);
+    else
+        audioController.setVolumeOriginal( (double)ui->originalAudioVolume->value() / 100);
+}
+
+void MainWindow::on_filteredAudioMute_toggled(bool mute)
+{
+    if(mute)
+        audioController.setVolumeFiltered(0);
+    else
+        audioController.setVolumeFiltered( (double)ui->filteredAudioVolume->value() / 100);
+}
+
+void MainWindow::on_filteredAudioVolume_sliderMoved(int value)
+{
+    if(!ui->filteredAudioMute->isChecked())
+        audioController.setVolumeFiltered((double)value / 100);
 }
 

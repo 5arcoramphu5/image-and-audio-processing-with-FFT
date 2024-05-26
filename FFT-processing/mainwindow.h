@@ -32,6 +32,16 @@ private slots:
 
     void on_tabWidget_currentChanged(int index);
 
+    void on_playButton_toggled(bool checked);
+
+    void on_originalAudioVolume_sliderMoved(int position);
+
+    void on_originalAudioMute_toggled(bool checked);
+
+    void on_filteredAudioMute_toggled(bool checked);
+
+    void on_filteredAudioVolume_sliderMoved(int position);
+
 private:
     Ui::MainWindow *ui;
 
