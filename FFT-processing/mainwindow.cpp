@@ -126,7 +126,7 @@ void MainWindow::on_uploadButton_clicked()
             QString fileName;
             audioController.openAudioFromFileExplorer(this, fileName);
             ui->fileName->setText(trimFileNamePath(fileName));
-
+            ui->fileName->setStyleSheet("font-weight: bold;");
             // TODO
         }
         break;

@@ -1,12 +1,15 @@
 #include "audio_controller.h"
 #include "widgets_utils.h"
+#include "../fourier/fourier.h"
 
+#include <array>
+#include <complex>
 #include <QFileDialog>
 #include <QDebug>
 #include <QAudioDeviceInfo>
 #include <QBuffer>
 
-AudioController::AudioController(): N(32), audioReady(false), audioStarted(false)
+AudioController::AudioController(): audioReady(false), audioStarted(false)
 {}
 
 AudioController::~AudioController()
@@ -23,18 +26,20 @@ void AudioController::openAudioFromFileExplorer(QWidget *parent, QString &fileNa
     fileName = QFileDialog::getOpenFileName(parent, "Open Audio File", QString(), "Audio (*.wav *.mp3)");
 
     // creating file format
-    targetFormat = QAudioFormat(QAudioDeviceInfo::defaultOutputDevice().preferredFormat());
-    targetFormat.setCodec(QStringLiteral("audio/pcm"));
-    targetFormat.setSampleType(QAudioFormat::SignedInt);
+    format = QAudioFormat(QAudioDeviceInfo::defaultOutputDevice().preferredFormat());
+    format.setCodec(QStringLiteral("audio/pcm"));
+    format.setSampleType(QAudioFormat::SignedInt);
     if (QSysInfo::ByteOrder == QSysInfo::BigEndian)
-      targetFormat.setByteOrder(QAudioFormat::BigEndian);
+      format.setByteOrder(QAudioFormat::BigEndian);
     else
-      targetFormat.setByteOrder(QAudioFormat::LittleEndian);
+      format.setByteOrder(QAudioFormat::LittleEndian);
+
+    bytesPerSample = format.sampleSize() / 8;
 
     // setting up QAudioDecoder
     audioDecoder = new QAudioDecoder(parent);
 
-    QAudioFormat decodeFormat(targetFormat);
+    QAudioFormat decodeFormat(format);
     decodeFormat.setSampleType(QAudioFormat::Float);
 
     audioDecoder->setAudioFormat(decodeFormat);
@@ -45,8 +50,11 @@ void AudioController::openAudioFromFileExplorer(QWidget *parent, QString &fileNa
     QObject::connect(audioDecoder, &QAudioDecoder::finished, this, &AudioController::audioFinished);
 
     // setting up QAudioOutputs
-    audioOutputOriginal = new QAudioOutput(targetFormat, this);
-    audioOutputFiltered = new QAudioOutput(targetFormat, this);
+    audioOutputOriginal = new QAudioOutput(format, this);
+    audioOutputFiltered = new QAudioOutput(format, this);
+
+    audioOutputOriginal->setNotifyInterval(format.durationForBytes(FFT_SIZE * bytesPerSample) / 1000);
+    QObject::connect(audioOutputOriginal, &QAudioOutput::notify, this, &AudioController::notifyOriginalAudio);
 }
 
 void AudioController::bufferReady()
@@ -62,8 +70,37 @@ void AudioController::audioFinished()
     bufferOriginal = new QBuffer(&byteArrOriginal);
     bufferOriginal->open(QIODevice::ReadOnly);
 
-    bufferFiltered = new QBuffer(bufferOriginal);
+    bufferFiltered = new QBuffer(&byteArrOriginal);
     bufferFiltered->open(QIODevice::ReadOnly);
+}
+
+void AudioController::notifyOriginalAudio()
+{
+    // find current frame
+    int currentPos = format.bytesForDuration(audioOutputOriginal->processedUSecs());
+    int frame[FFT_SIZE];
+
+    int j = 0;
+    for(int i = currentPos - FFT_SIZE / 2 + 1; i <= currentPos + FFT_SIZE / 2; ++i)
+    {
+        frame[j] = (int)byteArrOriginal.at(i * bytesPerSample);
+        j++;
+    }
+
+    // calculate FFT of the frame
+    std::complex<double> fftResult[FFT_SIZE];
+    fft1D(frame, fftResult, FFT_SIZE);
+
+    // update frequency bars
+    int freqsForBin = FFT_SIZE / BINS;
+    for(int i = 0; i < BINS; ++i)
+    {
+        double value = 0;
+        for(int x = 0; x < freqsForBin; ++x)
+            value += std::abs(fftResult[freqsForBin*i + x]) / 100;
+
+        originalVisualisationSliders[i]->setValue(std::round(value));
+    }
 }
 
 void AudioController::play()
@@ -74,12 +111,12 @@ void AudioController::play()
     if(audioStarted)
     {
         audioOutputOriginal->resume();
-        // audioOutputFiltered->resume();
+        audioOutputFiltered->resume();
     }
     else
     {
         audioOutputOriginal->start(bufferOriginal);
-        // audioOutputFiltered->start(bufferFiltered);
+        audioOutputFiltered->start(bufferFiltered);
     }
 }
 
@@ -89,7 +126,7 @@ void AudioController::pause()
         return;
 
     audioOutputOriginal->suspend();
-    // audioOutputFiltered->suspend();
+    audioOutputFiltered->suspend();
 }
 
 void AudioController::setVolumeOriginal(double volume)
@@ -114,10 +151,10 @@ void AudioController::saveAudioToDistFromFileExplorer(QWidget *parent)
 
 void AudioController::addFilteredVisualisation(QBoxLayout &parent)
 {
-    filteredVisualisationSliders = createAudioVisualisation(parent, N);
+    filteredVisualisationSliders = createAudioVisualisation(parent, BINS);
 }
 
 void AudioController:: addOriginalVisualisation(QBoxLayout &parent)
 {
-    originalVisualisationSliders = createAudioVisualisation(parent, N);
+    originalVisualisationSliders = createAudioVisualisation(parent, BINS);
 }

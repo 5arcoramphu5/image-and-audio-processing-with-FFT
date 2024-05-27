@@ -13,4 +13,7 @@ ComplexImage ifft2D(const ComplexImage &image);
 
 ComplexImage fftShift(const ComplexImage &image);
 
+void fft1D(COMPLEX_DOUBLE* series, COMPLEX_DOUBLE* DFT, int len);
+void fft1D(int* series, COMPLEX_DOUBLE* DFT, int len);
+
 #endif // FOURIER_H

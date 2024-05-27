@@ -10,6 +10,9 @@
 #include <QMediaPlayer>
 #include <QBuffer>
 
+#define FFT_SIZE 1024
+#define BINS 64
+
 class AudioController: public QObject
 {
 public:
@@ -38,17 +41,20 @@ private slots:
     void bufferReady();
     void audioFinished();
 
+    void notifyOriginalAudio();
+
 private:
 
     bool audioReady;
     bool audioStarted;
 
-    const int N;
+    int bytesPerSample;
+
     QSlider** originalVisualisationSliders;
     QSlider** filteredVisualisationSliders;
 
     QAudioDecoder* audioDecoder;
-    QAudioFormat targetFormat;
+    QAudioFormat format;
 
     QAudioOutput* audioOutputOriginal;
     QAudioOutput* audioOutputFiltered;

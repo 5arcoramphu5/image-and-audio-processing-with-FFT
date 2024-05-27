@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <vector>
+#include <QDebug>
 
 typedef std::complex<double> COMPLEX_DOUBLE;
 
@@ -152,3 +153,46 @@ ComplexImage fftShift(const ComplexImage &image)
 
     return shiftedImage;
 }
+
+void fft1D(COMPLEX_DOUBLE* series, COMPLEX_DOUBLE* DFT, int len)
+{
+    if(len == 1)
+    {
+        DFT[0] = series[0];
+        return;
+    }
+
+    COMPLEX_DOUBLE* even = new COMPLEX_DOUBLE[len/2];
+    COMPLEX_DOUBLE* odd = new COMPLEX_DOUBLE[len/2];
+    COMPLEX_DOUBLE* evenDFT = new COMPLEX_DOUBLE[len/2];
+    COMPLEX_DOUBLE* oddDFT = new COMPLEX_DOUBLE[len/2];
+
+    for(int i = 0; i < len/2; ++i)
+    {
+        even[i] = series[2*i];
+        odd[i] = series[2*i+1];
+    }
+
+    fft1D(even, evenDFT, len/2);
+    fft1D(odd, oddDFT, len/2);
+
+    for(int i = 0; i < len/2; ++i)
+    {
+        DFT[i] = even[i] + pow(omega(len), -i) * oddDFT[i];
+        DFT[i + len/2] = even[i] - pow(omega(len), -i) * oddDFT[i];
+    }
+
+    delete[] even, odd, evenDFT, oddDFT;
+}
+
+void fft1D(int* in, COMPLEX_DOUBLE* out, int len)
+{
+    COMPLEX_DOUBLE* newIn = new COMPLEX_DOUBLE[len];
+    for(int i = 0; i < len; ++i)
+        newIn[i] = COMPLEX_DOUBLE(in[i], 0);
+
+    fft1D(newIn, out, len);
+
+    delete[] newIn;
+}
+
