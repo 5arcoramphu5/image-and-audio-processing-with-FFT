@@ -4,6 +4,8 @@
 
 #include <array>
 #include <complex>
+#include <cmath>
+
 #include <QFileDialog>
 #include <QDebug>
 #include <QAudioDeviceInfo>
@@ -11,13 +13,16 @@
 #include <QtEndian>
 #include <iostream>
 
-AudioController::AudioController(): audioReady(false), audioStarted(false)
+AudioController::AudioController(): audioReady(false), audioStarted(false), maxAbsBinValue(0)
 {}
 
 AudioController::~AudioController()
 {
     delete[] originalVisualisationSliders;
     delete[] filteredVisualisationSliders;
+
+    for(int i = 0; i < numberOfDFTs; ++i)
+        delete[] DFTs[i];
 
     delete audioDecoder;
 }
@@ -59,6 +64,52 @@ void AudioController::openAudioFromFileExplorer(QWidget *parent, QString &fileNa
     QObject::connect(audioOutputOriginal, &QAudioOutput::notify, this, &AudioController::notifyOriginalAudio);
 }
 
+void AudioController::calculateDFTs()
+{
+    numberOfDFTs = floor((float)byteArrOriginal.length() / (bytesPerSample*FFT_SIZE));
+    DFTs = new COMPLEX_DOUBLE*[numberOfDFTs];
+
+    qDebug() << "number of DFTs: " << numberOfDFTs;
+
+    for(int k = 0; k < numberOfDFTs; ++k)
+    {
+        // calculating the DFT of a portion of samples
+        DFTs[k] = new COMPLEX_DOUBLE[FFT_SIZE];
+        int* frame = new int[FFT_SIZE];
+
+        for(int i = 0; i < FFT_SIZE; ++i)
+        {
+            int pos = (k*FFT_SIZE + i) * bytesPerSample;
+            QByteArray arr;
+            for(int j = 0; j < bytesPerSample; ++j)
+                arr.append(byteArrOriginal[pos+j]);
+
+            frame[i] = QSysInfo::ByteOrder == QSysInfo::BigEndian ? qFromBigEndian<qint16>(arr.data()) : qFromLittleEndian<qint16>(arr.data());
+        }
+
+        fft1D(frame, DFTs[k], FFT_SIZE);
+
+        delete[] frame;
+
+        // calculating max abs sum in visualisation
+        int halfFFT = FFT_SIZE / 2;
+        int freqsForBin = halfFFT / BINS;
+
+        for(int i = 0; i < BINS; ++i)
+        {
+            double value = 0;
+            for(int x = 0; x < freqsForBin; ++x)
+                value += std::abs(DFTs[k][halfFFT + freqsForBin*i + x]);
+
+            if(value > maxAbsBinValue)
+                maxAbsBinValue = value;
+        }
+    }
+
+    qDebug() << "done calculating DFTs";
+    qDebug() << "max value: " << maxAbsBinValue;
+}
+
 void AudioController::bufferReady()
 {
     auto audioBuffer = audioDecoder->read();
@@ -70,6 +121,7 @@ void AudioController::audioDecodingFinished()
 {
     audioReady = true;
     audioLength = format.durationForBytes(byteArrOriginal.length());
+    calculateDFTs();
 
     bufferOriginal = new QBuffer(&byteArrOriginal);
     bufferOriginal->open(QIODevice::ReadOnly);
@@ -86,7 +138,7 @@ void AudioController::notifyOriginalAudio()
     int currentPos = format.bytesForDuration(timePassed);
 
     // stop audio after buffer ended
-    if(currentPos + FFT_SIZE/2*bytesPerSample >= byteArrOriginal.length())
+    if(currentPos >= byteArrOriginal.length())
     {
         audioOutputOriginal->stop();
         audioOutputFiltered->stop();
@@ -95,39 +147,25 @@ void AudioController::notifyOriginalAudio()
         return;
     }
 
-    // find current frame
-    int frame[FFT_SIZE];
-    int j = 0;
+    int i = floor((double)currentPos / (FFT_SIZE*bytesPerSample));
 
-    for(int offset = -FFT_SIZE / 2; offset < FFT_SIZE / 2; ++offset)
+    if(i < numberOfDFTs)
     {
-        int pos = currentPos + offset*bytesPerSample;
-
-        QByteArray arr;
-        for(int i = 0; i < bytesPerSample; ++i)
-            arr.append(byteArrOriginal[pos+i]);
-
-        frame[j] = QSysInfo::ByteOrder == QSysInfo::BigEndian ? qFromBigEndian<qint16>(arr.data()) : qFromLittleEndian<qint16>(arr.data());
-        j++;
+        updateVisualisations(DFTs[i]);
     }
-
-    // calculate FFT of the frame
-    std::complex<double> fftResult[FFT_SIZE];
-    fft1D(frame, fftResult, FFT_SIZE);
-
-    updateVisualisations(fftResult);
 }
 
 void AudioController::updateVisualisations(std::complex<double>* DFT)
 {
     // update frequency bars (they show the second half of the FFT)
-    int freqsForBin = FFT_SIZE / BINS;
+    int halfFFT = FFT_SIZE / 2;
+    int freqsForBin = halfFFT / BINS;
 
     for(int i = 0; i < BINS; ++i)
     {
         double value = 0;
         for(int x = 0; x < freqsForBin; ++x)
-            value += std::abs(DFT[freqsForBin*i + x]) / 1000;
+            value += std::abs(DFT[halfFFT + freqsForBin*i + x]) / (maxAbsBinValue/500);
 
         originalVisualisationSliders[i]->setValue(std::round(value));
     }
@@ -156,6 +194,7 @@ void AudioController::play()
     {
         audioOutputOriginal->start(bufferOriginal);
         audioOutputFiltered->start(bufferFiltered);
+        audioStarted = true;
     }
 }
 

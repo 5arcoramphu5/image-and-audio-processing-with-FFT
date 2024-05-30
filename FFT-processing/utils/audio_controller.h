@@ -12,7 +12,7 @@
 #include <QMediaPlayer>
 #include <QBuffer>
 
-#define FFT_SIZE 1024
+#define FFT_SIZE 256
 #define BINS 64
 
 class AudioController: public QObject
@@ -42,6 +42,9 @@ public:
     void updateVisualisations(std::complex<double>* DFT);
     void clearVisualisations();
 
+    // FFT
+    void calculateDFTs();
+
 private slots:
     void bufferReady();
     void audioDecodingFinished();
@@ -56,9 +59,13 @@ private:
 
     int bytesPerSample;
 
+    std::complex<double>** DFTs;
+    int numberOfDFTs;
+
     QSlider** originalVisualisationSliders;
     QSlider** filteredVisualisationSliders;
     QSlider* timePassedSlider;
+    double maxAbsBinValue;
 
     QAudioDecoder* audioDecoder;
     QAudioFormat format;
