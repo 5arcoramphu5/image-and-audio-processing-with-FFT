@@ -8,6 +8,8 @@
 #include <QDebug>
 #include <QAudioDeviceInfo>
 #include <QBuffer>
+#include <QtEndian>
+#include <iostream>
 
 AudioController::AudioController(): audioReady(false), audioStarted(false)
 {}
@@ -47,7 +49,7 @@ void AudioController::openAudioFromFileExplorer(QWidget *parent, QString &fileNa
     audioDecoder->start();
 
     QObject::connect(audioDecoder, &QAudioDecoder::bufferReady, this, &AudioController::bufferReady);
-    QObject::connect(audioDecoder, &QAudioDecoder::finished, this, &AudioController::audioFinished);
+    QObject::connect(audioDecoder, &QAudioDecoder::finished, this, &AudioController::audioDecodingFinished);
 
     // setting up QAudioOutputs
     audioOutputOriginal = new QAudioOutput(format, this);
@@ -63,9 +65,11 @@ void AudioController::bufferReady()
     byteArrOriginal.append(audioBuffer.constData<char>(), audioBuffer.byteCount());
 }
 
-void AudioController::audioFinished()
+
+void AudioController::audioDecodingFinished()
 {
     audioReady = true;
+    audioLength = format.durationForBytes(byteArrOriginal.length());
 
     bufferOriginal = new QBuffer(&byteArrOriginal);
     bufferOriginal->open(QIODevice::ReadOnly);
@@ -76,14 +80,34 @@ void AudioController::audioFinished()
 
 void AudioController::notifyOriginalAudio()
 {
-    // find current frame
-    int currentPos = format.bytesForDuration(audioOutputOriginal->processedUSecs());
-    int frame[FFT_SIZE];
+    int timePassed = audioOutputOriginal->processedUSecs();
+    timePassedSlider->setValue(std::round( (double)timePassed / audioLength * 100 ));
 
-    int j = 0;
-    for(int i = currentPos - FFT_SIZE / 2 + 1; i <= currentPos + FFT_SIZE / 2; ++i)
+    int currentPos = format.bytesForDuration(timePassed);
+
+    // stop audio after buffer ended
+    if(currentPos + FFT_SIZE/2*bytesPerSample >= byteArrOriginal.length())
     {
-        frame[j] = (int)byteArrOriginal.at(i * bytesPerSample);
+        audioOutputOriginal->stop();
+        audioOutputFiltered->stop();
+        audioStarted = false;
+        clearVisualisations();
+        return;
+    }
+
+    // find current frame
+    int frame[FFT_SIZE];
+    int j = 0;
+
+    for(int offset = -FFT_SIZE / 2; offset < FFT_SIZE / 2; ++offset)
+    {
+        int pos = currentPos + offset*bytesPerSample;
+
+        QByteArray arr;
+        for(int i = 0; i < bytesPerSample; ++i)
+            arr.append(byteArrOriginal[pos+i]);
+
+        frame[j] = QSysInfo::ByteOrder == QSysInfo::BigEndian ? qFromBigEndian<qint16>(arr.data()) : qFromLittleEndian<qint16>(arr.data());
         j++;
     }
 
@@ -91,15 +115,30 @@ void AudioController::notifyOriginalAudio()
     std::complex<double> fftResult[FFT_SIZE];
     fft1D(frame, fftResult, FFT_SIZE);
 
-    // update frequency bars
+    updateVisualisations(fftResult);
+}
+
+void AudioController::updateVisualisations(std::complex<double>* DFT)
+{
+    // update frequency bars (they show the second half of the FFT)
     int freqsForBin = FFT_SIZE / BINS;
+
     for(int i = 0; i < BINS; ++i)
     {
         double value = 0;
         for(int x = 0; x < freqsForBin; ++x)
-            value += std::abs(fftResult[freqsForBin*i + x]) / 100;
+            value += std::abs(DFT[freqsForBin*i + x]) / 1000;
 
         originalVisualisationSliders[i]->setValue(std::round(value));
+    }
+}
+
+void AudioController::clearVisualisations()
+{
+    for(int i = 0; i < BINS; ++i)
+    {
+        originalVisualisationSliders[i]->setValue(0);
+        filteredVisualisationSliders[i]->setValue(0);
     }
 }
 
@@ -157,4 +196,9 @@ void AudioController::addFilteredVisualisation(QBoxLayout &parent)
 void AudioController:: addOriginalVisualisation(QBoxLayout &parent)
 {
     originalVisualisationSliders = createAudioVisualisation(parent, BINS);
+}
+
+void AudioController::setTimePassedSliderRef(QSlider* slider)
+{
+    timePassedSlider = slider;
 }

@@ -178,8 +178,9 @@ void fft1D(COMPLEX_DOUBLE* series, COMPLEX_DOUBLE* DFT, int len)
 
     for(int i = 0; i < len/2; ++i)
     {
-        DFT[i] = even[i] + pow(omega(len), -i) * oddDFT[i];
-        DFT[i + len/2] = even[i] - pow(omega(len), -i) * oddDFT[i];
+        COMPLEX_DOUBLE multiplier = exp(-2 * i * M_PI * I / (COMPLEX_DOUBLE)len);
+        DFT[i] = evenDFT[i] + multiplier * oddDFT[i];
+        DFT[i + len/2] = evenDFT[i] - multiplier * oddDFT[i];
     }
 
     delete[] even, odd, evenDFT, oddDFT;

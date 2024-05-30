@@ -30,6 +30,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     audioController.addFilteredVisualisation(*ui->filteredAudioVisualisation);
     audioController.addOriginalVisualisation(*ui->originalAudioVisualisation);
+    audioController.setTimePassedSliderRef(ui->audioTimeSlider);
 
     images[0] = ui->unprocessedImage;
     images[1] = ui->processedImage;

@@ -1,6 +1,8 @@
 #ifndef AUDIO_UTILS_H
 #define AUDIO_UTILS_H
 
+#include <complex>
+
 #include <QWidget>
 #include <QBoxLayout>
 #include <QSlider>
@@ -34,12 +36,15 @@ public:
 
     // UI
     void addOriginalVisualisation(QBoxLayout &parent);
-
     void addFilteredVisualisation(QBoxLayout &parent);
+    void setTimePassedSliderRef(QSlider* slider);
+
+    void updateVisualisations(std::complex<double>* DFT);
+    void clearVisualisations();
 
 private slots:
     void bufferReady();
-    void audioFinished();
+    void audioDecodingFinished();
 
     void notifyOriginalAudio();
 
@@ -47,11 +52,13 @@ private:
 
     bool audioReady;
     bool audioStarted;
+    qint64 audioLength;
 
     int bytesPerSample;
 
     QSlider** originalVisualisationSliders;
     QSlider** filteredVisualisationSliders;
+    QSlider* timePassedSlider;
 
     QAudioDecoder* audioDecoder;
     QAudioFormat format;

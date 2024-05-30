@@ -648,6 +648,9 @@ QCheckBox::indicator:checked {
                </item>
                <item>
                 <widget class="QSlider" name="audioTimeSlider">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
                  </property>
