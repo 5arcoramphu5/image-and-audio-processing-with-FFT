@@ -182,7 +182,7 @@ void MainWindow::processImageWithFFT()
 
 void MainWindow::processAudioWithFFT()
 {
-    filters.performAudioFiltering();//audioController.DFTs, audioController.filteredDFTs, audioController.numberOfDFTs, FFT_SIZE);
+    filters.performAudioFiltering(audioController.DFTs, audioController.filteredDFTs, audioController.numberOfDFTs, FFT_SIZE);
     audioController.refreshAfterFiltering();
 }
 

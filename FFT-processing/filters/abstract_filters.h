@@ -33,7 +33,7 @@ class AudioFilter : public Filter
 public:
     AudioFilter(QString _displayName);
 
-    virtual void performFiltering() = 0;
+    virtual void performFiltering(COMPLEX_DOUBLE** DFTs, COMPLEX_DOUBLE** filteredDFTs, int numberOfDFTs, int FFTsize) = 0;
 };
 
 // BY PARAMETERS TYPE
@@ -79,10 +79,10 @@ public:
 
     void insertParametersUI(QBoxLayout &layout);
 
-    void performFiltering();
+protected:
+    const int N;
 
 private:
-    const int N;
     const int initialValue;
     QSlider** sliders;
 };

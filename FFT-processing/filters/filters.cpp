@@ -67,7 +67,7 @@ void Filters::performImageFiltering(ComplexImage &dft) const
 }
 
 
-void Filters::performAudioFiltering()// COMPLEX_DOUBLE** DFTs, COMPLEX_DOUBLE** filteredDFTs, int numberOfDFTs, int FFTsize) const
+void Filters::performAudioFiltering(COMPLEX_DOUBLE** DFTs, COMPLEX_DOUBLE** filteredDFTs, int numberOfDFTs, int FFTsize) const
 {
-    audioFilters[currentIndex]->performFiltering();
+    audioFilters[currentIndex]->performFiltering(DFTs, filteredDFTs, numberOfDFTs, FFTsize);
 }

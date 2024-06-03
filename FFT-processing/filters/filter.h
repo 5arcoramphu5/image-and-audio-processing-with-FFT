@@ -25,6 +25,7 @@ class EqualizerFilter: public MultipleHorizontalSlidersAudioFilter
 public:
     EqualizerFilter(const int N);
 
+    void performFiltering(COMPLEX_DOUBLE** DFTs, COMPLEX_DOUBLE** filteredDFTs, int numberOfDFTs, int FFTsize);
 };
 
 #endif // FILTER_H

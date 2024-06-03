@@ -73,7 +73,7 @@ MultipleHorizontalSlidersAudioFilter::~MultipleHorizontalSlidersAudioFilter()
 double MultipleHorizontalSlidersAudioFilter::getValueAtIndex(const int i) const
 {
     int sliderValue = sliders[i]->value();
-    return (double)sliderValue / 99;
+    return (double)sliderValue / 50; // values from 0 to 2
 }
 
 void MultipleHorizontalSlidersAudioFilter::insertParametersUI(QBoxLayout &layout)
@@ -87,9 +87,3 @@ void MultipleHorizontalSlidersAudioFilter::insertParametersUI(QBoxLayout &layout
         hLayout->addWidget(sliders[i]);
     }
 }
-
-void MultipleHorizontalSlidersAudioFilter::performFiltering()
-{
-    qDebug() << "filtering audio...";
-}
-

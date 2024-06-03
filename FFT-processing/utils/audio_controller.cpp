@@ -190,12 +190,12 @@ void AudioController::updateVisualisations(std::complex<double>* DFT, std::compl
         double filteredValue = 0;
         for(int x = 0; x < freqsForBin; ++x)
         {
-            originalValue += std::abs(DFT[halfFFT + freqsForBin*i + x]) / (maxAbsBinValue/500);
-            filteredValue += std::abs(filteredDFT[halfFFT + freqsForBin*i + x]) / (maxAbsBinValue/500);
+            originalValue += std::abs(DFT[freqsForBin*i + x]) / (maxAbsBinValue/500);
+            filteredValue += std::abs(filteredDFT[freqsForBin*i + x]) / (maxAbsBinValue/500);
         }
 
-        originalVisualisationSliders[BINS - i - 1]->setValue(std::round(originalValue));
-        filteredVisualisationSliders[BINS - i - 1]->setValue(std::round(filteredValue));
+        originalVisualisationSliders[i]->setValue(std::round(originalValue));
+        filteredVisualisationSliders[i]->setValue(std::round(filteredValue));
     }
 }
 
@@ -272,29 +272,12 @@ void AudioController::setTimePassedSliderRef(QSlider* slider)
 
 void AudioController::refreshAfterFiltering()
 {
-    // operacje na DFTs
-    // debug: ucięcie środka transformaty (wysokich częstotliwości)
-    double scale = 0.9;
-    int cutOffValue = FFT_SIZE/2 * scale;
-    int center = FFT_SIZE/2;
-    for(int k = 0; k < numberOfDFTs; ++k)
-    {
-        for(int i = 0; i < FFT_SIZE; ++i)
-            filteredDFTs[k][i] = DFTs[k][i];
-
-        // modyfikacja
-        for(int i = center - cutOffValue; i < center + cutOffValue; ++i)
-        {
-            filteredDFTs[k][i] = 0;
-        }
-    }
-
     // wykonanie ifft i zapisanie w byteArrFiltered
     byteArrFiltered.clear();
 
     for(int i = 0; i < numberOfDFTs; ++i)
     {
-        qDebug() << i << " / " << numberOfDFTs;
+        // qDebug() << i << " / " << numberOfDFTs;
 
         COMPLEX_DOUBLE iDFT[FFT_SIZE];
         ifft1D(filteredDFTs[i], iDFT, FFT_SIZE);
