@@ -29,11 +29,9 @@ QSlider** createAudioVisualisation(QBoxLayout &layout, const int N)
                                         "background: white; }");
 
     auto sliders = new QSlider*[N];
-
-    double step = (double)100 / N;
     for(int i = 0; i < N; ++i)
     {
-        sliders[i] = createSlider( i*step, Qt::Orientation::Vertical);
+        sliders[i] = createSlider( 0, Qt::Orientation::Vertical);
         sliders[i]->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         sliders[i]->setStyleSheet(stylesheet);
         sliders[i]->setEnabled(false);

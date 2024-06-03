@@ -20,7 +20,7 @@ class Filters
         void insertParametersUI(QBoxLayout &layout) const;
 
         void performImageFiltering(ComplexImage &dft) const;
-        void performAudioFiltering() const;
+        void performAudioFiltering();//COMPLEX_DOUBLE** DFTs, COMPLEX_DOUBLE** filteredDFTs, int numberOfDFTs, int FFTsize) const;
 
         void setIndex(int index);
 

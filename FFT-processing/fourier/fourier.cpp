@@ -197,3 +197,18 @@ void fft1D(int* in, COMPLEX_DOUBLE* out, int len)
     delete[] newIn;
 }
 
+void ifft1D(COMPLEX_DOUBLE* DFT, COMPLEX_DOUBLE* series, int len)
+{
+    for(int i = 0; i < len; ++i)
+        series[i] = swapComplex(DFT[i]);
+
+    COMPLEX_DOUBLE* ifft = new COMPLEX_DOUBLE[len];
+    fft1D(series, ifft, len);
+
+    for(int i = 0; i < len; ++i)
+    {
+        series[i] = swapComplex(ifft[i]) / (COMPLEX_DOUBLE)len;
+    }
+
+    delete[] ifft;
+}

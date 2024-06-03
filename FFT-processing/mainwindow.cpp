@@ -76,15 +76,16 @@ void MainWindow::on_applyButton_clicked()
 
         case Mode::AUDIO:
         {
-            auto watcher = new QFutureWatcher<void>(this);
-            connect(watcher, &QFutureWatcher<void>::finished,
-                [watcher, this] ()
-            {
-                watcher->deleteLater();
-                // TODO
-            });
+            processAudioWithFFT();
+            // auto watcher = new QFutureWatcher<void>(this);
+            // connect(watcher, &QFutureWatcher<void>::finished,
+            //     [watcher, this] ()
+            // {
+            //     watcher->deleteLater();
+            //     // TODO
+            // });
 
-            watcher->setFuture(QtConcurrent::run(this, &MainWindow::processAudioWithFFT));
+            // watcher->setFuture(QtConcurrent::run(this, &MainWindow::processAudioWithFFT));
         }
         break;
     }
@@ -128,7 +129,6 @@ void MainWindow::on_uploadButton_clicked()
             audioController.openAudioFromFileExplorer(this, fileName);
             ui->fileName->setText(trimFileNamePath(fileName));
             ui->fileName->setStyleSheet("font-weight: bold;");
-            // TODO
         }
         break;
     }
@@ -182,7 +182,8 @@ void MainWindow::processImageWithFFT()
 
 void MainWindow::processAudioWithFFT()
 {
-    filters.performAudioFiltering();
+    filters.performAudioFiltering();//audioController.DFTs, audioController.filteredDFTs, audioController.numberOfDFTs, FFT_SIZE);
+    audioController.refreshAfterFiltering();
 }
 
 void MainWindow::on_filterSelectionComboBox_currentIndexChanged(int index)

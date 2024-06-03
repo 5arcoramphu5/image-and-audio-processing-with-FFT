@@ -12,8 +12,9 @@
 #include <QMediaPlayer>
 #include <QBuffer>
 
-#define FFT_SIZE 256
-#define BINS 64
+#define FFT_SIZE 1024
+#define BINS 32
+#define MAX_QINT16 32767
 
 class AudioController: public QObject
 {
@@ -39,11 +40,17 @@ public:
     void addFilteredVisualisation(QBoxLayout &parent);
     void setTimePassedSliderRef(QSlider* slider);
 
-    void updateVisualisations(std::complex<double>* DFT);
+    void updateVisualisations(std::complex<double>* DFT, std::complex<double>* filteredDFT);
     void clearVisualisations();
 
     // FFT
     void calculateDFTs();
+
+    void refreshAfterFiltering();
+
+    std::complex<double>** DFTs;
+    std::complex<double>** filteredDFTs;
+    int numberOfDFTs;
 
 private slots:
     void bufferReady();
@@ -53,14 +60,14 @@ private slots:
 
 private:
 
+    void reloadAudio();
+    void stopAudio();
+
     bool audioReady;
     bool audioStarted;
     qint64 audioLength;
 
     int bytesPerSample;
-
-    std::complex<double>** DFTs;
-    int numberOfDFTs;
 
     QSlider** originalVisualisationSliders;
     QSlider** filteredVisualisationSliders;
@@ -74,6 +81,7 @@ private:
     QAudioOutput* audioOutputFiltered;
 
     QByteArray byteArrOriginal;
+    QByteArray byteArrFiltered;
     QBuffer *bufferOriginal;
     QBuffer *bufferFiltered;
 };

@@ -22,7 +22,10 @@ AudioController::~AudioController()
     delete[] filteredVisualisationSliders;
 
     for(int i = 0; i < numberOfDFTs; ++i)
+    {
         delete[] DFTs[i];
+        delete[] filteredDFTs[i];
+    }
 
     delete audioDecoder;
 }
@@ -68,13 +71,13 @@ void AudioController::calculateDFTs()
 {
     numberOfDFTs = floor((float)byteArrOriginal.length() / (bytesPerSample*FFT_SIZE));
     DFTs = new COMPLEX_DOUBLE*[numberOfDFTs];
-
-    qDebug() << "number of DFTs: " << numberOfDFTs;
+    filteredDFTs = new COMPLEX_DOUBLE*[numberOfDFTs];
 
     for(int k = 0; k < numberOfDFTs; ++k)
     {
         // calculating the DFT of a portion of samples
         DFTs[k] = new COMPLEX_DOUBLE[FFT_SIZE];
+        filteredDFTs[k] = new COMPLEX_DOUBLE[FFT_SIZE];
         int* frame = new int[FFT_SIZE];
 
         for(int i = 0; i < FFT_SIZE; ++i)
@@ -91,6 +94,10 @@ void AudioController::calculateDFTs()
 
         delete[] frame;
 
+        //copying values to filteredDFTs
+        for(int i = 0; i < FFT_SIZE; ++i)
+            filteredDFTs[k][i] = DFTs[k][i];
+
         // calculating max abs sum in visualisation
         int halfFFT = FFT_SIZE / 2;
         int freqsForBin = halfFFT / BINS;
@@ -105,9 +112,6 @@ void AudioController::calculateDFTs()
                 maxAbsBinValue = value;
         }
     }
-
-    qDebug() << "done calculating DFTs";
-    qDebug() << "max value: " << maxAbsBinValue;
 }
 
 void AudioController::bufferReady()
@@ -123,11 +127,30 @@ void AudioController::audioDecodingFinished()
     audioLength = format.durationForBytes(byteArrOriginal.length());
     calculateDFTs();
 
+    byteArrFiltered = QByteArray(byteArrOriginal);
+    reloadAudio();
+
+    qDebug() << "audio ready";
+}
+
+void AudioController::reloadAudio()
+{
+    if(audioStarted)
+        stopAudio();
+
     bufferOriginal = new QBuffer(&byteArrOriginal);
     bufferOriginal->open(QIODevice::ReadOnly);
 
-    bufferFiltered = new QBuffer(&byteArrOriginal);
+    bufferFiltered = new QBuffer(&byteArrFiltered);
     bufferFiltered->open(QIODevice::ReadOnly);
+}
+
+void AudioController::stopAudio()
+{
+    audioOutputOriginal->stop();
+    audioOutputFiltered->stop();
+    timePassedSlider->setValue(0);
+    audioStarted = false;
 }
 
 void AudioController::notifyOriginalAudio()
@@ -151,23 +174,28 @@ void AudioController::notifyOriginalAudio()
 
     if(i < numberOfDFTs)
     {
-        updateVisualisations(DFTs[i]);
+        updateVisualisations(DFTs[i], filteredDFTs[i]);
     }
 }
 
-void AudioController::updateVisualisations(std::complex<double>* DFT)
+void AudioController::updateVisualisations(std::complex<double>* DFT, std::complex<double>* filteredDFT)
 {
-    // update frequency bars (they show the second half of the FFT)
+    // update frequency bars (they show the second half of the FFT in reverse order)
     int halfFFT = FFT_SIZE / 2;
     int freqsForBin = halfFFT / BINS;
 
     for(int i = 0; i < BINS; ++i)
     {
-        double value = 0;
+        double originalValue = 0;
+        double filteredValue = 0;
         for(int x = 0; x < freqsForBin; ++x)
-            value += std::abs(DFT[halfFFT + freqsForBin*i + x]) / (maxAbsBinValue/500);
+        {
+            originalValue += std::abs(DFT[halfFFT + freqsForBin*i + x]) / (maxAbsBinValue/500);
+            filteredValue += std::abs(filteredDFT[halfFFT + freqsForBin*i + x]) / (maxAbsBinValue/500);
+        }
 
-        originalVisualisationSliders[i]->setValue(std::round(value));
+        originalVisualisationSliders[BINS - i - 1]->setValue(std::round(originalValue));
+        filteredVisualisationSliders[BINS - i - 1]->setValue(std::round(filteredValue));
     }
 }
 
@@ -240,4 +268,60 @@ void AudioController:: addOriginalVisualisation(QBoxLayout &parent)
 void AudioController::setTimePassedSliderRef(QSlider* slider)
 {
     timePassedSlider = slider;
+}
+
+void AudioController::refreshAfterFiltering()
+{
+    // operacje na DFTs
+    // debug: ucięcie środka transformaty (wysokich częstotliwości)
+    double scale = 0.9;
+    int cutOffValue = FFT_SIZE/2 * scale;
+    int center = FFT_SIZE/2;
+    for(int k = 0; k < numberOfDFTs; ++k)
+    {
+        for(int i = 0; i < FFT_SIZE; ++i)
+            filteredDFTs[k][i] = DFTs[k][i];
+
+        // modyfikacja
+        for(int i = center - cutOffValue; i < center + cutOffValue; ++i)
+        {
+            filteredDFTs[k][i] = 0;
+        }
+    }
+
+    // wykonanie ifft i zapisanie w byteArrFiltered
+    byteArrFiltered.clear();
+
+    for(int i = 0; i < numberOfDFTs; ++i)
+    {
+        qDebug() << i << " / " << numberOfDFTs;
+
+        COMPLEX_DOUBLE iDFT[FFT_SIZE];
+        ifft1D(filteredDFTs[i], iDFT, FFT_SIZE);
+
+        for(int j = 0; j < FFT_SIZE; ++j)
+        {
+            int value = std::round(iDFT[j].real());
+
+            if(value > MAX_QINT16)
+                value = MAX_QINT16;
+            else if (value < -MAX_QINT16)
+                value = -MAX_QINT16;
+
+            qint16 qint16Value = value;
+
+            char buffer[2];
+            if(QSysInfo::ByteOrder == QSysInfo::BigEndian)
+                qToBigEndian(qint16Value, buffer);
+            else
+                qToLittleEndian(qint16Value, buffer);
+
+            byteArrFiltered.append(buffer, 2);
+        }
+    }
+
+    // przeładowanie kontrolera dźwięku
+    reloadAudio();
+
+    qDebug() << "applied";
 }
