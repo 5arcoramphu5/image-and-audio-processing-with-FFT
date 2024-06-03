@@ -197,6 +197,7 @@ void MainWindow::on_tabWidget_currentChanged(int index)
 {
     mode = index == 0 ? Mode::IMAGE : Mode::AUDIO;
     filters.setMode(mode);
+    filters.setIndex(0);
     updateFiltersSelection();
 }
 
